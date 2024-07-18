@@ -30,5 +30,5 @@ public class Hospital extends BaseTimeEntity {
 
     @ManyToOne
     @JoinColumn(name = "address_id", nullable = false)
-    private Address addressId;
+    private Address address;
 }
