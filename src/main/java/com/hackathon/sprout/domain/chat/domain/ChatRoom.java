@@ -1,5 +1,6 @@
 package com.hackathon.sprout.domain.chat.domain;
 
+import com.hackathon.sprout.domain.user.domain.User;
 import com.hackathon.sprout.global.shared.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,8 +27,9 @@ public class ChatRoom extends BaseTimeEntity {
     @Column(length = 3000)
     private String content;
 
-    @Column
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "chat_room_id")
