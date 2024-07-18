@@ -1,9 +1,10 @@
-package com.hackathon.sprout.domain.chat.dto;
+package com.hackathon.sprout.domain.chat.dto.response;
 
 import com.hackathon.sprout.domain.chat.domain.ChatRoom;
-import lombok.*;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 public class ChatRoomResponse {
@@ -15,13 +16,13 @@ public class ChatRoomResponse {
 
     private final LocalDateTime createdAt;
 
-    private final Long userId;
+    List<ChatMessageResponse> messages;
 
     public ChatRoomResponse(ChatRoom chatRoom){
         this.chatRoomId = chatRoom.getChatRoomId();
         this.title = chatRoom.getTitle();
         this.content = chatRoom.getContent();
         this.createdAt = chatRoom.getCreatedAt();
-        this.userId = chatRoom.getUserId();
+        this.messages = chatRoom.getChatMessageList().stream().map(ChatMessageResponse::new).toList();
     }
 }

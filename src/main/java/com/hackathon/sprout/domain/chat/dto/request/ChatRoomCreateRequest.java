@@ -1,4 +1,4 @@
-package com.hackathon.sprout.domain.chat.dto;
+package com.hackathon.sprout.domain.chat.dto.request;
 
 import com.hackathon.sprout.domain.chat.domain.ChatRoom;
 import lombok.AllArgsConstructor;

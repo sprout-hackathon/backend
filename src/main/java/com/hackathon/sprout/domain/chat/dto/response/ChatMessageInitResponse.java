@@ -1,13 +1,14 @@
-package com.hackathon.sprout.domain.chat.dto;
+package com.hackathon.sprout.domain.chat.dto.response;
 
 import com.hackathon.sprout.domain.chat.domain.ChatMessage;
-import com.hackathon.sprout.domain.chat.domain.ChatRoom;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
-public class ChatMessageResponse {
+public class ChatMessageInitResponse {
+    private final Long chatRoomId;
+
     private final Long chatMessageId;
 
     private final String content;
@@ -16,7 +17,8 @@ public class ChatMessageResponse {
 
     private final boolean isBot;
 
-    public ChatMessageResponse(ChatMessage chatMessage){
+    public ChatMessageInitResponse(ChatMessage chatMessage){
+        this.chatRoomId = chatMessage.getChatRoom().getChatRoomId();
         this.chatMessageId = chatMessage.getChatMessageId();
         this.content = chatMessage.getContent();
         this.createdAt = chatMessage.getCreatedAt();
