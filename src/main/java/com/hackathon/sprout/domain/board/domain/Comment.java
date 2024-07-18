@@ -25,6 +25,6 @@ public class Comment extends BaseTimeEntity {
     private Board boardId;
 
     @ManyToOne
-    @JoinColumn(name = "comment_id")
+    @JoinColumn(name = "parent_comment_id")
     private Comment parentCommentId;
 }
