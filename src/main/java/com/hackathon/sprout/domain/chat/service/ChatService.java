@@ -2,15 +2,18 @@ package com.hackathon.sprout.domain.chat.service;
 
 import com.hackathon.sprout.domain.chat.domain.ChatMessage;
 import com.hackathon.sprout.domain.chat.domain.ChatRoom;
-import com.hackathon.sprout.domain.chat.dto.ChatMessageCreateRequest;
+import com.hackathon.sprout.domain.chat.dto.request.ChatMessageCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.ChatMessageInsert;
-import com.hackathon.sprout.domain.chat.dto.ChatRoomCreateRequest;
-import com.hackathon.sprout.domain.chat.dto.ChatRoomResponse;
+import com.hackathon.sprout.domain.chat.dto.request.ChatRoomCreateRequest;
+import com.hackathon.sprout.domain.chat.dto.response.ChatRoomResponse;
 import com.hackathon.sprout.domain.chat.repository.ChatMessageRepository;
 import com.hackathon.sprout.domain.chat.repository.ChatRoomRepository;
+import com.hackathon.sprout.global.shared.DateUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -20,10 +23,11 @@ public class ChatService{
     private final ChatMessageRepository chatMessageRepository;
 
     public String chat(String content) {
+        //TODO : 실제 GPT API 연동
         return "지피티 반환 내용";
     }
 
-    public ChatMessage saveChatRoom(ChatRoomCreateRequest request) {
+    public ChatMessage createChatRoom(ChatRoomCreateRequest request) {
         String reply = chat(request.getTitle());
         ChatRoom chatRoom = chatRoomRepository.save(request.toEntity(reply));
 
@@ -66,9 +70,8 @@ public class ChatService{
         return chatMessageRepository.save(replyMessage);
     }
 
-    public ChatRoomResponse getChatRoom(Long roomId) {
-        ChatRoom chatRoom = chatRoomRepository.findById(roomId).get();
-        return new ChatRoomResponse(chatRoom);
+    public ChatRoom getChatRoom(Long roomId) {
+        return chatRoomRepository.findById(roomId).orElseThrow();
     }
 
     public void deleteChatRoom(Long roomId) {
@@ -76,6 +79,10 @@ public class ChatService{
     }
 
     public List<ChatRoom> getChatRoomList(String date) {
-        return chatRoomRepository.findAll();
+        LocalDate localDate = DateUtil.convertToLocalDate(date);
+        LocalDateTime startDate = DateUtil.toStartOfDay(localDate);
+        LocalDateTime endDate = DateUtil.toEndOfDay(localDate);
+
+        return chatRoomRepository.findByCreatedAtBetween(startDate,endDate);
     }
 }
