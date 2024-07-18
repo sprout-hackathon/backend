@@ -25,7 +25,7 @@ public class JwtProvider {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException e) {
-            return e.getClaims();
+            throw new ExpiredTokenException(e);
         }
     }
 
