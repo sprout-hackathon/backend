@@ -13,7 +13,8 @@ public enum ErrorCode {
     INVALID_NATION_CODE(400, "INVALID_NATION_CODE", "유효하지 않은 국가 코드입니다."),
     INVALID_LANGUAGE_CODE(400, "INVALID_LANGUAGE_CODE", "유효하지 않은 언어 코드입니다."),
     INVALID_HOSPITAL_ID(400, "INVALID_HOSPITAL_ID", "유효하지 않은 병원 ID입니다."),
-    USER_NOT_FOUND(404, "USER_NOT_FOUND", "사용자를 찾을 수 없습니다.");
+    USER_NOT_FOUND(404, "USER_NOT_FOUND", "사용자를 찾을 수 없습니다."),
+    INVALID_PASSWORD(401, "INVALID_PASSWORD", "비밀번호가 틀렸습니다.");
 
 
     private final int httpStatus;
