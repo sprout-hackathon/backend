@@ -7,15 +7,21 @@ import com.hackathon.sprout.domain.country.repository.NationRepository;
 import com.hackathon.sprout.domain.hospital.exception.InvalidHospitalException;
 import com.hackathon.sprout.domain.hospital.repository.HospitalRepository;
 import com.hackathon.sprout.domain.user.domain.User;
+import com.hackathon.sprout.domain.user.dto.UserLoginRequest;
 import com.hackathon.sprout.domain.user.dto.UserRegisterRequest;
+import com.hackathon.sprout.domain.user.exception.InvalidPasswordException;
+import com.hackathon.sprout.domain.user.exception.UserNotFoundException;
 import com.hackathon.sprout.domain.user.repository.UserRepository;
 import com.hackathon.sprout.domain.workhistory.domain.WorkHistory;
 import com.hackathon.sprout.domain.workhistory.dto.WorkHistoryRequest;
 import com.hackathon.sprout.domain.workhistory.repository.WorkHistoryRepository;
+import com.hackathon.sprout.global.jwt.JwtProvider;
+import com.hackathon.sprout.global.jwt.dto.JwtResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +32,7 @@ public class UserService {
     private final NationRepository nationRepository;
     private final LanguageRepository languageRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
 
     public void register(UserRegisterRequest userRegisterRequest) {
         User user = User.builder()
@@ -53,5 +60,26 @@ public class UserService {
                     .build();
             workHistoryRepository.save(workHistory);
         }
+    }
+
+    @Transactional
+    public JwtResponse login(UserLoginRequest userLoginRequest) {
+        User user = userRepository.findById(userLoginRequest.getId())
+                .orElseThrow(() -> new UserNotFoundException());
+
+        if (!passwordEncoder.matches(userLoginRequest.getPassword(), user.getPassword())) {
+            throw new InvalidPasswordException();
+        }
+
+        String accessToken = jwtProvider.createAccessToken(user.getId());
+        String refreshToken = jwtProvider.createRefreshToken(user.getId());
+
+        user.setRefreshToken(refreshToken);
+        userRepository.save(user);
+
+        return JwtResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 }
