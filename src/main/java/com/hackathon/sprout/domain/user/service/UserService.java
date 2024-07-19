@@ -19,6 +19,7 @@ import com.hackathon.sprout.global.jwt.JwtProvider;
 import com.hackathon.sprout.global.jwt.dto.JwtResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,5 +82,16 @@ public class UserService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    @Transactional
+    public void deleteUser(Authentication authentication) {
+        String userId = (String) authentication.getPrincipal();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        user.setIsDeleted(true);
+        userRepository.save(user);
     }
 }
