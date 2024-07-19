@@ -1,13 +1,11 @@
 package com.hackathon.sprout.domain.hospital.controller;
 
-import com.hackathon.sprout.domain.hospital.domain.Hospital;
 import com.hackathon.sprout.domain.hospital.dto.HospitalResponse;
 import com.hackathon.sprout.domain.hospital.service.HospitalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
