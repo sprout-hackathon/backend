@@ -3,10 +3,10 @@ package com.hackathon.sprout.domain.recruitment.dto;
 import lombok.*;
 
 @Getter
-@Builder
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 public class SearchCondition {
-    String sido;
+    String sido = "";
 }
