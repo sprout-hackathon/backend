@@ -2,6 +2,7 @@ package com.hackathon.sprout.domain.chat.service;
 
 import com.hackathon.sprout.domain.chat.domain.ChatMessage;
 import com.hackathon.sprout.domain.chat.domain.ChatRoom;
+import com.hackathon.sprout.domain.chat.dto.SearchCondition;
 import com.hackathon.sprout.domain.chat.dto.request.ChatMessageCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.ChatMessageInsert;
 import com.hackathon.sprout.domain.chat.dto.request.ChatRoomCreateRequest;
@@ -86,11 +87,14 @@ public class ChatService{
         chatRoomRepository.deleteById(roomId);
     }
 
-    public List<ChatRoom> getChatRoomList(String date) {
-        LocalDate localDate = DateUtil.convertToLocalDate(date);
+    public List<ChatRoom> getChatRoomList(SearchCondition condition) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = (String) authentication.getPrincipal();
+
+        LocalDate localDate = DateUtil.convertToLocalDate(condition.getDate());
         LocalDateTime startDate = DateUtil.toStartOfDay(localDate);
         LocalDateTime endDate = DateUtil.toEndOfDay(localDate);
 
-        return chatRoomRepository.findByCreatedAtBetween(startDate,endDate);
+        return chatRoomRepository.findByUser_IdAndCreatedAtBetween(userId,startDate,endDate);
     }
 }

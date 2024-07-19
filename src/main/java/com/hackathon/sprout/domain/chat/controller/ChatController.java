@@ -1,6 +1,7 @@
 package com.hackathon.sprout.domain.chat.controller;
 
 import com.hackathon.sprout.domain.chat.domain.ChatMessage;
+import com.hackathon.sprout.domain.chat.dto.SearchCondition;
 import com.hackathon.sprout.domain.chat.dto.request.ChatMessageCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.request.ChatRoomCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.response.ChatMessageInitResponse;
@@ -22,9 +23,9 @@ public class ChatController {
     private final ChatService chatService;
 
     @GetMapping("/rooms")
-    public ResponseEntity<List<ChatRoomBasicInfoResponse>> getRoomList(@RequestParam String date){
+    public ResponseEntity<List<ChatRoomBasicInfoResponse>> getRoomList(@ModelAttribute SearchCondition condition){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(chatService.getChatRoomList(date).stream().map(ChatRoomBasicInfoResponse::new).toList());
+                .body(chatService.getChatRoomList(condition).stream().map(ChatRoomBasicInfoResponse::new).toList());
     }
 
     @PostMapping("/rooms")
