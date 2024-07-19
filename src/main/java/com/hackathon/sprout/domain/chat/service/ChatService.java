@@ -8,8 +8,12 @@ import com.hackathon.sprout.domain.chat.dto.request.ChatRoomCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.response.ChatRoomResponse;
 import com.hackathon.sprout.domain.chat.repository.ChatMessageRepository;
 import com.hackathon.sprout.domain.chat.repository.ChatRoomRepository;
+import com.hackathon.sprout.domain.user.repository.UserRepository;
+import com.hackathon.sprout.domain.user.service.UserService;
 import com.hackathon.sprout.global.shared.DateUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -21,6 +25,7 @@ import java.util.List;
 public class ChatService{
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
+    private final UserRepository userRepository;
 
     public String chat(String content) {
         //TODO : 실제 GPT API 연동
@@ -28,8 +33,11 @@ public class ChatService{
     }
 
     public ChatMessage createChatRoom(ChatRoomCreateRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = (String) authentication.getPrincipal();
+
         String reply = chat(request.getTitle());
-        ChatRoom chatRoom = chatRoomRepository.save(request.toEntity(reply));
+        ChatRoom chatRoom = chatRoomRepository.save(request.toEntity(reply, userRepository.findById(userId).orElseThrow()));
 
         ChatMessageInsert chatMessageInsert = ChatMessageInsert.builder()
                 .chatRoom(chatRoom)

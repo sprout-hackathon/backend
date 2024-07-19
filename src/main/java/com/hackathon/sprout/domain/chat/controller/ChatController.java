@@ -21,13 +21,13 @@ import java.util.List;
 public class ChatController {
     private final ChatService chatService;
 
-    @GetMapping("/room")
+    @GetMapping("/rooms")
     public ResponseEntity<List<ChatRoomBasicInfoResponse>> getRoomList(@RequestParam String date){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(chatService.getChatRoomList(date).stream().map(ChatRoomBasicInfoResponse::new).toList());
     }
 
-    @PostMapping("/room")
+    @PostMapping("/rooms")
     public ResponseEntity<ChatMessageInitResponse> createRoom(@RequestBody ChatRoomCreateRequest request){
         ChatMessage chatMessage = chatService.createChatRoom(request);
 
@@ -35,19 +35,19 @@ public class ChatController {
                 .body(new ChatMessageInitResponse(chatMessage));
     }
 
-    @GetMapping("/room/{roomId}")
+    @GetMapping("/rooms/{roomId}")
     public ResponseEntity<ChatRoomResponse> getRoom(@PathVariable Long roomId){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ChatRoomResponse(chatService.getChatRoom(roomId)));
     }
 
-    @PostMapping("/message")
+    @PostMapping("/messages")
     public ResponseEntity<ChatMessageResponse> createMessage(@RequestBody ChatMessageCreateRequest request){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ChatMessageResponse(chatService.saveChatMessage(request)));
     }
 
-    @DeleteMapping("/room/{roomId}")
+    @DeleteMapping("/rooms/{roomId}")
     public ResponseEntity<Void> deleteRoom(@PathVariable Long roomId) {
         chatService.deleteChatRoom(roomId);
         return ResponseEntity.noContent().build();
