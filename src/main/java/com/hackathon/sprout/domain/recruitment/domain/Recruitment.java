@@ -37,5 +37,5 @@ public class Recruitment extends BaseTimeEntity {
 
     @ManyToOne
     @JoinColumn(name = "hospital_id")
-    private Hospital hospitalId;
+    private Hospital hospital;
 }
