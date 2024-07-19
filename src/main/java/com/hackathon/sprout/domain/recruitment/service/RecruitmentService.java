@@ -24,7 +24,11 @@ public class RecruitmentService {
     }
 
     public Page<Recruitment> getRecruitmentList(SearchCondition condition, Pageable pageable){
-        return recruitmentRepository.findAllBySido(condition.getSido(), pageable);
+        if(condition.getSido().isEmpty()){
+            return recruitmentRepository.findAll(pageable);
+        }else{
+            return recruitmentRepository.findAllBySido(condition.getSido(), pageable);
+        }
     }
 
     public List<Recruitment> getRecruitmentList(){
