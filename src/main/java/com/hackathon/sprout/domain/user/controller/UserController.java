@@ -6,10 +6,8 @@ import com.hackathon.sprout.domain.user.service.UserService;
 import com.hackathon.sprout.global.jwt.dto.JwtResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -27,5 +25,11 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody UserLoginRequest userLoginRequest) {
         JwtResponse jwtResponse = userService.login(userLoginRequest);
         return ResponseEntity.status(201).body(jwtResponse);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteUser(Authentication authentication) {
+        userService.deleteUser(authentication);
+        return ResponseEntity.status(204).build();
     }
 }
