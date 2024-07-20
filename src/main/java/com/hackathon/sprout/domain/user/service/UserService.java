@@ -6,6 +6,7 @@ import com.hackathon.sprout.domain.country.repository.LanguageRepository;
 import com.hackathon.sprout.domain.country.repository.NationRepository;
 import com.hackathon.sprout.domain.hospital.exception.InvalidHospitalException;
 import com.hackathon.sprout.domain.hospital.repository.HospitalRepository;
+import com.hackathon.sprout.domain.hospital.service.HospitalService;
 import com.hackathon.sprout.domain.user.domain.User;
 import com.hackathon.sprout.domain.user.dto.UserLoginRequest;
 import com.hackathon.sprout.domain.user.dto.UserRegisterRequest;
@@ -15,6 +16,7 @@ import com.hackathon.sprout.domain.user.repository.UserRepository;
 import com.hackathon.sprout.domain.workhistory.domain.WorkHistory;
 import com.hackathon.sprout.domain.workhistory.dto.WorkHistoryRequest;
 import com.hackathon.sprout.domain.workhistory.repository.WorkHistoryRepository;
+import com.hackathon.sprout.domain.workhistory.service.WorkHistoryService;
 import com.hackathon.sprout.global.jwt.JwtProvider;
 import com.hackathon.sprout.global.jwt.dto.JwtResponse;
 import com.hackathon.sprout.global.shared.AuthUtil;
@@ -29,8 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final WorkHistoryRepository workHistoryRepository;
-    private final HospitalRepository hospitalRepository;
+    private final WorkHistoryService workHistoryService;
     private final NationRepository nationRepository;
     private final LanguageRepository languageRepository;
     private final PasswordEncoder passwordEncoder;
@@ -42,9 +43,9 @@ public class UserService {
                 .password(passwordEncoder.encode(userRegisterRequest.getPassword()))
                 .nickname(userRegisterRequest.getNickname())
                 .nationCode(nationRepository.findById(userRegisterRequest.getNationCode())
-                        .orElseThrow(() -> new InvalidNationCodeException()))
+                        .orElseThrow(InvalidNationCodeException::new))
                 .languageCode(languageRepository.findById(userRegisterRequest.getLanguageCode())
-                        .orElseThrow(() -> new InvalidLanguageCodeException()))
+                        .orElseThrow(InvalidLanguageCodeException::new))
                 .proficiency(userRegisterRequest.getProficiency())
                 .hasCertification(userRegisterRequest.getHasCertification())
                 .certificationCode(userRegisterRequest.getCertificationCode())
@@ -54,20 +55,14 @@ public class UserService {
         user = userRepository.save(user);
 
         for (WorkHistoryRequest workHistoryRequest : userRegisterRequest.getWorkHistories()) {
-            WorkHistory workHistory = WorkHistory.builder()
-                    .workDuration(workHistoryRequest.getWorkDuration())
-                    .hospitalId(hospitalRepository.findById(workHistoryRequest.getHospitalId())
-                            .orElseThrow(() -> new InvalidHospitalException()))
-                    .userId(user)
-                    .build();
-            workHistoryRepository.save(workHistory);
+            workHistoryService.createWorkHistory(user, workHistoryRequest);
         }
     }
 
     @Transactional
     public JwtResponse login(UserLoginRequest userLoginRequest) {
         User user = userRepository.findById(userLoginRequest.getId())
-                .orElseThrow(() -> new UserNotFoundException());
+                .orElseThrow(UserNotFoundException::new);
 
         if (!passwordEncoder.matches(userLoginRequest.getPassword(), user.getPassword())) {
             throw new InvalidPasswordException();

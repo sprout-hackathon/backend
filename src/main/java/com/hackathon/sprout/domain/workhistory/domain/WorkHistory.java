@@ -22,9 +22,18 @@ public class WorkHistory {
 
     @ManyToOne
     @JoinColumn(name = "hospital_id")
-    private Hospital hospitalId;
+    private Hospital hospital;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User userId;
+    private User user;
+
+    //== 비즈니스 로직 ==//
+    public void updateWorkDuration(Byte workDuration){
+        this.workDuration = workDuration;
+    }
+
+    public void updateHospital(Hospital hospital){
+        this.hospital = hospital;
+    }
 }
