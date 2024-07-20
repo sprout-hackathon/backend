@@ -17,6 +17,7 @@ import com.hackathon.sprout.domain.workhistory.dto.WorkHistoryRequest;
 import com.hackathon.sprout.domain.workhistory.repository.WorkHistoryRepository;
 import com.hackathon.sprout.global.jwt.JwtProvider;
 import com.hackathon.sprout.global.jwt.dto.JwtResponse;
+import com.hackathon.sprout.global.shared.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -93,5 +94,11 @@ public class UserService {
 
         user.setIsDeleted(true);
         userRepository.save(user);
+    }
+
+    public User getUserFromAuth(){
+        String userId = AuthUtil.getUserIdFromAuth();
+        return userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
     }
 }
