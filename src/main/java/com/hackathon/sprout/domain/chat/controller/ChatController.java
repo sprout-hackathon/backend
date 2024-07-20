@@ -45,7 +45,7 @@ public class ChatController {
     @PostMapping("/messages")
     public ResponseEntity<ChatMessageResponse> createMessage(@RequestBody ChatMessageCreateRequest request){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ChatMessageResponse(chatService.saveChatMessage(request)));
+                .body(new ChatMessageResponse(chatService.saveChatMessage(request), chatService.chatForRecommendation(request.getContent())));
     }
 
     @DeleteMapping("/rooms/{roomId}")

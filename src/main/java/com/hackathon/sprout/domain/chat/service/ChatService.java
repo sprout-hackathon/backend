@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -28,10 +29,23 @@ public class ChatService{
     private final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
 
-    public String chat(String content) {
+    public String chat(String message) {
         //TODO : 실제 GPT API 연동
         return "지피티 반환 내용";
     }
+
+    public List<String> chatForRecommendation(String message) {
+        //TODO : 실제 GPT API 연동
+
+        List<String> recommendationList = new ArrayList<>();
+
+        recommendationList.add("요양 보호사 자격증 따는 방법");
+        recommendationList.add("요양 보호사의 힘든 점");
+        recommendationList.add("외국인 요양보호사가 되려면?");
+
+        return recommendationList;
+    }
+
 
     public ChatMessage createChatRoom(ChatRoomCreateRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
