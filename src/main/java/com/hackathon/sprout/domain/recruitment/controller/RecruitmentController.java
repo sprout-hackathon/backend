@@ -1,8 +1,10 @@
 package com.hackathon.sprout.domain.recruitment.controller;
 
 import com.hackathon.sprout.domain.recruitment.domain.Recruitment;
+import com.hackathon.sprout.domain.recruitment.domain.RecruitmentScrap;
 import com.hackathon.sprout.domain.recruitment.dto.RecruitmentCreateRequest;
 import com.hackathon.sprout.domain.recruitment.dto.RecruitmentResponse;
+import com.hackathon.sprout.domain.recruitment.dto.RecruitmentScrapResponse;
 import com.hackathon.sprout.domain.recruitment.dto.SearchCondition;
 import com.hackathon.sprout.domain.recruitment.service.RecruitmentService;
 import lombok.RequiredArgsConstructor;
@@ -40,5 +42,20 @@ public class RecruitmentController {
     public ResponseEntity<RecruitmentResponse> getRecruitment(@PathVariable Long recruitmentId){
         return ResponseEntity.status(HttpStatus.OK)
             .body(new RecruitmentResponse(recruitmentService.getRecruitment(recruitmentId)));
+    }
+    @PostMapping("/{recruitmentId}/scrap")
+    public ResponseEntity<Long> scrapRecruitment(@PathVariable Long recruitmentId){
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(recruitmentService.scrapRecruitment(recruitmentId));
+    }
+
+    @DeleteMapping("/scrap/{recruitmentScrapId}")
+    public ResponseEntity<Void> cancelScrap(@PathVariable Long recruitmentScrapId){
+        recruitmentService.cancelScrap(recruitmentScrapId);
+        return ResponseEntity.noContent().build();
+    }
+    @GetMapping("/scrap")
+    public ResponseEntity<List<RecruitmentScrapResponse>> getScrapList(){
+        return ResponseEntity.ok(recruitmentService.getScrapList().stream().map(RecruitmentScrapResponse::new).toList());
     }
 }
