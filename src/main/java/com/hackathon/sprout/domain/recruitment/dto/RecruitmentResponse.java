@@ -16,6 +16,8 @@ public class RecruitmentResponse {
 
     private final Byte conditionsHour;
 
+    private final String title;
+
     private final String content;
 
     private final Integer salary;
@@ -29,6 +31,7 @@ public class RecruitmentResponse {
         this.requiredExp = recruitment.getRequiredExp();
         this.conditionsDay = recruitment.getConditionsDay();
         this.conditionsHour = recruitment.getConditionsHour();
+        this.title = recruitment.getTitle();
         this.content = recruitment.getContent();
         this.salary = recruitment.getSalary();
         this.state = recruitment.getState();

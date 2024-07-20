@@ -26,6 +26,9 @@ public class Recruitment extends BaseTimeEntity {
     @Column
     private Byte conditionsHour;
 
+    @Column(length = 200)
+    private String title;
+
     @Column(length = 3000)
     private String content;
 
