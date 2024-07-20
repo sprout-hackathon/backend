@@ -17,6 +17,8 @@ public class RecruitmentCreateRequest {
 
     private Byte conditionsHour;
 
+    private String title;
+
     private String content;
 
     private Integer salary;
@@ -31,6 +33,7 @@ public class RecruitmentCreateRequest {
             .requiredExp(requiredExp)
             .conditionsDay(conditionsDay)
             .conditionsHour(conditionsHour)
+            .title(title)
             .content(content)
             .salary(salary)
             .state(state)
