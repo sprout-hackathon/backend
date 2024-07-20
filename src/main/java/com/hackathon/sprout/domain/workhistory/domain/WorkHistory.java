@@ -22,9 +22,9 @@ public class WorkHistory {
 
     @ManyToOne
     @JoinColumn(name = "hospital_id")
-    private Hospital hospitalId;
+    private Hospital hospital;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User userId;
+    private User user;
 }
