@@ -27,4 +27,13 @@ public class WorkHistory {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    //== 비즈니스 로직 ==//
+    public void updateWorkDuration(Byte workDuration){
+        this.workDuration = workDuration;
+    }
+
+    public void updateHospital(Hospital hospital){
+        this.hospital = hospital;
+    }
 }
