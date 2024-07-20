@@ -1,6 +1,7 @@
 package com.hackathon.sprout.domain.chat.controller;
 
 import com.hackathon.sprout.domain.chat.domain.ChatMessage;
+import com.hackathon.sprout.domain.chat.dto.SearchCondition;
 import com.hackathon.sprout.domain.chat.dto.request.ChatMessageCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.request.ChatRoomCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.response.ChatMessageInitResponse;
@@ -21,13 +22,13 @@ import java.util.List;
 public class ChatController {
     private final ChatService chatService;
 
-    @GetMapping("/room")
-    public ResponseEntity<List<ChatRoomBasicInfoResponse>> getRoomList(@RequestParam String date){
+    @GetMapping("/rooms")
+    public ResponseEntity<List<ChatRoomBasicInfoResponse>> getRoomList(@ModelAttribute SearchCondition condition){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(chatService.getChatRoomList(date).stream().map(ChatRoomBasicInfoResponse::new).toList());
+                .body(chatService.getChatRoomList(condition).stream().map(ChatRoomBasicInfoResponse::new).toList());
     }
 
-    @PostMapping("/room")
+    @PostMapping("/rooms")
     public ResponseEntity<ChatMessageInitResponse> createRoom(@RequestBody ChatRoomCreateRequest request){
         ChatMessage chatMessage = chatService.createChatRoom(request);
 
@@ -35,19 +36,19 @@ public class ChatController {
                 .body(new ChatMessageInitResponse(chatMessage));
     }
 
-    @GetMapping("/room/{roomId}")
+    @GetMapping("/rooms/{roomId}")
     public ResponseEntity<ChatRoomResponse> getRoom(@PathVariable Long roomId){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ChatRoomResponse(chatService.getChatRoom(roomId)));
     }
 
-    @PostMapping("/message")
+    @PostMapping("/messages")
     public ResponseEntity<ChatMessageResponse> createMessage(@RequestBody ChatMessageCreateRequest request){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ChatMessageResponse(chatService.saveChatMessage(request)));
+                .body(new ChatMessageResponse(chatService.saveChatMessage(request), chatService.chatForRecommendation(request.getContent())));
     }
 
-    @DeleteMapping("/room/{roomId}")
+    @DeleteMapping("/rooms/{roomId}")
     public ResponseEntity<Void> deleteRoom(@PathVariable Long roomId) {
         chatService.deleteChatRoom(roomId);
         return ResponseEntity.noContent().build();

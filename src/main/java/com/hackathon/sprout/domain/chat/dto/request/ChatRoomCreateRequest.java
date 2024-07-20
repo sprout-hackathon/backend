@@ -13,9 +13,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ChatRoomCreateRequest {
     private String title;
-    private User user;
 
-    public ChatRoom toEntity(String content){
+    public ChatRoom toEntity(String content, User user){
         return ChatRoom.builder()
                 .title(title)
                 .content(content)
