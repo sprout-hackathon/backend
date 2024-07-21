@@ -1,6 +1,7 @@
 package com.hackathon.sprout.domain.board.controller;
 
 import com.hackathon.sprout.domain.board.dto.BoardRequest;
+import com.hackathon.sprout.domain.board.dto.BoardResponse;
 import com.hackathon.sprout.domain.board.dto.CommentRequest;
 import com.hackathon.sprout.domain.board.dto.CommentUpdateRequest;
 import com.hackathon.sprout.domain.board.service.BoardService;
@@ -52,5 +53,11 @@ public class BoardController {
     public ResponseEntity<Void> deleteComment(Authentication authentication, @PathVariable("commentId") Long commentId) {
         commentService.deleteComment(authentication, commentId);
         return ResponseEntity.status(204).build();
+    }
+
+    @GetMapping("/{boardId}")
+    public ResponseEntity<BoardResponse> getBoard(@PathVariable("boardId") Long boardId) {
+        BoardResponse boardResponse = boardService.getBoard(boardId);
+        return ResponseEntity.status(200).body(boardResponse);
     }
 }
