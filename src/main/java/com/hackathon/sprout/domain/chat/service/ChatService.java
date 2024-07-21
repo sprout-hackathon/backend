@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ChatService{
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
@@ -93,6 +95,7 @@ public class ChatService{
         return chatMessageRepository.save(replyMessage);
     }
 
+    @Transactional(readOnly = true)
     public ChatRoom getChatRoom(Long roomId) {
         return chatRoomRepository.findById(roomId).orElseThrow();
     }
@@ -101,6 +104,7 @@ public class ChatService{
         chatRoomRepository.deleteById(roomId);
     }
 
+    @Transactional(readOnly = true)
     public List<ChatRoom> getChatRoomList(SearchCondition condition) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = (String) authentication.getPrincipal();
