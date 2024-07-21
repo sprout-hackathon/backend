@@ -2,6 +2,7 @@ package com.hackathon.sprout.domain.user.controller;
 
 import com.hackathon.sprout.domain.user.dto.UserLoginRequest;
 import com.hackathon.sprout.domain.user.dto.UserRegisterRequest;
+import com.hackathon.sprout.domain.user.dto.UserUpdateRequest;
 import com.hackathon.sprout.domain.user.service.UserService;
 import com.hackathon.sprout.global.jwt.dto.JwtResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,12 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody UserLoginRequest userLoginRequest) {
         JwtResponse jwtResponse = userService.login(userLoginRequest);
         return ResponseEntity.status(201).body(jwtResponse);
+    }
+
+    @PatchMapping
+    public ResponseEntity<Void> updateUser(Authentication authentication, @RequestBody UserUpdateRequest userUpdateRequest) {
+        userService.updateUser(authentication, userUpdateRequest);
+        return ResponseEntity.status(200).build();
     }
 
     @DeleteMapping
