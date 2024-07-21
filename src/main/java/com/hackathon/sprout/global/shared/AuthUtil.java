@@ -8,4 +8,7 @@ public class AuthUtil {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (String) authentication.getPrincipal();
     }
+    public static String getUserIdFromAuth(Authentication authentication){
+        return (String) authentication.getPrincipal();
+    }
 }

@@ -112,6 +112,10 @@ public class UserService {
         user.setIsDeleted(true);
         userRepository.save(user);
     }
+    public User getUser(String userId){
+        return userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+    }
 
     public User getUserFromAuth() {
         String userId = AuthUtil.getUserIdFromAuth();

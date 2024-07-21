@@ -47,8 +47,4 @@ public class WorkHistoryController {
         workHistoryService.deleteWorkHistory(workHistoryId);
         return ResponseEntity.noContent().build();
     }
-
-
-
-
 }
