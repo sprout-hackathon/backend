@@ -1,38 +1,42 @@
 package com.hackathon.sprout.domain.user.service;
 
+import com.hackathon.sprout.domain.application.dto.ApplicationResponse;
+import com.hackathon.sprout.domain.application.repository.ApplicationRepository;
 import com.hackathon.sprout.domain.country.exception.InvalidLanguageCodeException;
 import com.hackathon.sprout.domain.country.exception.InvalidNationCodeException;
 import com.hackathon.sprout.domain.country.repository.LanguageRepository;
 import com.hackathon.sprout.domain.country.repository.NationRepository;
-import com.hackathon.sprout.domain.hospital.exception.InvalidHospitalException;
-import com.hackathon.sprout.domain.hospital.repository.HospitalRepository;
-import com.hackathon.sprout.domain.hospital.service.HospitalService;
 import com.hackathon.sprout.domain.user.domain.User;
 import com.hackathon.sprout.domain.user.dto.UserLoginRequest;
 import com.hackathon.sprout.domain.user.dto.UserRegisterRequest;
+import com.hackathon.sprout.domain.user.dto.UserResponse;
 import com.hackathon.sprout.domain.user.dto.UserUpdateRequest;
 import com.hackathon.sprout.domain.user.exception.InvalidPasswordException;
 import com.hackathon.sprout.domain.user.exception.UserNotFoundException;
 import com.hackathon.sprout.domain.user.repository.UserRepository;
-import com.hackathon.sprout.domain.workhistory.domain.WorkHistory;
 import com.hackathon.sprout.domain.workhistory.dto.WorkHistoryRequest;
+import com.hackathon.sprout.domain.workhistory.dto.WorkHistoryResponse;
 import com.hackathon.sprout.domain.workhistory.repository.WorkHistoryRepository;
 import com.hackathon.sprout.domain.workhistory.service.WorkHistoryService;
 import com.hackathon.sprout.global.jwt.JwtProvider;
 import com.hackathon.sprout.global.jwt.dto.JwtResponse;
 import com.hackathon.sprout.global.shared.AuthUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final WorkHistoryRepository workHistoryRepository;
     private final WorkHistoryService workHistoryService;
+    private final ApplicationRepository applicationRepository;
     private final NationRepository nationRepository;
     private final LanguageRepository languageRepository;
     private final PasswordEncoder passwordEncoder;
@@ -109,9 +113,41 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public User getUserFromAuth(){
+    public User getUserFromAuth() {
         String userId = AuthUtil.getUserIdFromAuth();
         return userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
+    }
+
+    @Transactional(readOnly = true)
+    public UserResponse getUser(Authentication authentication) {
+        String userId = (String) authentication.getPrincipal();
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+        List<WorkHistoryResponse> workHistories = workHistoryRepository.findAllByUser(user).stream()
+                .map(WorkHistoryResponse::new)
+                .collect(Collectors.toList());
+
+        List<ApplicationResponse> applications = applicationRepository.findAllByUser(user).stream()
+                .map(ApplicationResponse::new)
+                .collect(Collectors.toList());
+
+        int totalWorkMonths = workHistories.stream()
+                .mapToInt(wh -> wh.getWorkDuration() == null ? 0 : wh.getWorkDuration())
+                .sum();
+
+        return UserResponse.builder()
+                .id(user.getId())
+                .nickname(user.getNickname())
+                .nationCode(user.getNationCode().getNationCode())
+                .languageCode(user.getLanguageCode().getLanguageCode())
+                .proficiency(user.getProficiency())
+                .hasCertification(user.getHasCertification())
+                .totalWorkYear(totalWorkMonths / 12)
+                .totalWorkMonth(totalWorkMonths % 12)
+                .applications(applications)
+                .workHistories(workHistories)
+                .certificationCode(user.getCertificationCode())
+                .build();
     }
 }
