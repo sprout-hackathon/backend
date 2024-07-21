@@ -10,6 +10,7 @@ import com.hackathon.sprout.domain.hospital.service.HospitalService;
 import com.hackathon.sprout.domain.user.domain.User;
 import com.hackathon.sprout.domain.user.dto.UserLoginRequest;
 import com.hackathon.sprout.domain.user.dto.UserRegisterRequest;
+import com.hackathon.sprout.domain.user.dto.UserUpdateRequest;
 import com.hackathon.sprout.domain.user.exception.InvalidPasswordException;
 import com.hackathon.sprout.domain.user.exception.UserNotFoundException;
 import com.hackathon.sprout.domain.user.repository.UserRepository;
@@ -78,6 +79,23 @@ public class UserService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    @Transactional
+    public void updateUser(Authentication authentication, UserUpdateRequest userUpdateRequest) {
+        String userId = (String) authentication.getPrincipal();
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+        user.setNickname(userUpdateRequest.getNickname());
+        user.setNationCode(nationRepository.findById(userUpdateRequest.getNationCode())
+                .orElseThrow(InvalidNationCodeException::new));
+        user.setLanguageCode(languageRepository.findById(userUpdateRequest.getLanguageCode())
+                .orElseThrow(InvalidLanguageCodeException::new));
+        user.setProficiency(userUpdateRequest.getProficiency());
+        user.setHasCertification(userUpdateRequest.getHasCertification());
+        user.setCertificationCode(userUpdateRequest.getCertificationCode());
+
+        userRepository.save(user);
     }
 
     @Transactional
