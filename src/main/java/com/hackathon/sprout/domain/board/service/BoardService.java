@@ -3,6 +3,7 @@ package com.hackathon.sprout.domain.board.service;
 import com.hackathon.sprout.domain.board.domain.Board;
 import com.hackathon.sprout.domain.board.domain.Comment;
 import com.hackathon.sprout.domain.board.dto.BoardRequest;
+import com.hackathon.sprout.domain.board.dto.BoardDetailResponse;
 import com.hackathon.sprout.domain.board.dto.BoardResponse;
 import com.hackathon.sprout.domain.board.dto.CommentResponse;
 import com.hackathon.sprout.domain.board.exception.BoardNotFoundException;
@@ -12,6 +13,8 @@ import com.hackathon.sprout.domain.user.domain.User;
 import com.hackathon.sprout.domain.user.exception.UserNotFoundException;
 import com.hackathon.sprout.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,7 +81,7 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardResponse getBoard(Long boardId) {
+    public BoardDetailResponse getBoard(Long boardId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(BoardNotFoundException::new);
 
@@ -90,6 +93,14 @@ public class BoardService {
                 .map(CommentResponse::new)
                 .collect(Collectors.toList());
 
-        return new BoardResponse(board, commentResponses);
+        return new BoardDetailResponse(board, commentResponses);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<BoardResponse> getAllBoards(Pageable pageable) {
+        return boardRepository.findAll(pageable).map(board -> {
+            int commentNum = commentRepository.countByBoardId(board);
+            return new BoardResponse(board, commentNum);
+        });
     }
 }
