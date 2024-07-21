@@ -5,10 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
-public class BoardResponse {
+public class BoardDetailResponse {
     private Long boardId;
     private String title;
     private String content;
@@ -18,9 +19,10 @@ public class BoardResponse {
     private Integer views;
     private Long userId;
     private Boolean isAnonymous;
-    private int commentNum;
+    private Boolean isDeleted;
+    private List<CommentResponse> comments;
 
-    public BoardResponse(Board board, int commentNum) {
+    public BoardDetailResponse(Board board, List<CommentResponse> comments) {
         this.boardId = board.getBoardId();
         this.title = board.getTitle();
         this.content = board.getContent();
@@ -30,6 +32,7 @@ public class BoardResponse {
         this.views = board.getViews();
         this.userId = board.getUserId().getUserId();
         this.isAnonymous = board.getIsAnonymous();
-        this.commentNum = commentNum;
+        this.isDeleted = board.getIsDeleted();
+        this.comments = comments;
     }
 }
