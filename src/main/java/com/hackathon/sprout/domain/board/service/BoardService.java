@@ -77,10 +77,13 @@ public class BoardService {
         boardRepository.save(board);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public BoardResponse getBoard(Long boardId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(BoardNotFoundException::new);
+
+        board.setViews(board.getViews() + 1);
+        boardRepository.save(board);
 
         List<Comment> comments = commentRepository.findAllByBoardId(board);
         List<CommentResponse> commentResponses = comments.stream()
