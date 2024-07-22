@@ -1,13 +1,12 @@
 package com.hackathon.sprout.domain.board.controller;
 
-import com.hackathon.sprout.domain.board.dto.BoardRequest;
-import com.hackathon.sprout.domain.board.dto.BoardResponse;
-import com.hackathon.sprout.domain.board.dto.CommentRequest;
-import com.hackathon.sprout.domain.board.dto.CommentUpdateRequest;
+import com.hackathon.sprout.domain.board.dto.*;
 import com.hackathon.sprout.domain.board.service.BoardService;
 import com.hackathon.sprout.domain.board.service.CommentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -56,8 +55,14 @@ public class BoardController {
     }
 
     @GetMapping("/{boardId}")
-    public ResponseEntity<BoardResponse> getBoard(@PathVariable("boardId") Long boardId) {
-        BoardResponse boardResponse = boardService.getBoard(boardId);
-        return ResponseEntity.status(200).body(boardResponse);
+    public ResponseEntity<BoardDetailResponse> getBoard(@PathVariable("boardId") Long boardId) {
+        BoardDetailResponse boardDetailResponse = boardService.getBoard(boardId);
+        return ResponseEntity.status(200).body(boardDetailResponse);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<BoardResponse>> getAllBoards(@PageableDefault(size = 10) Pageable pageable) {
+        Page<BoardResponse> boardPage = boardService.getAllBoards(pageable);
+        return ResponseEntity.status(200).body(boardPage);
     }
 }
