@@ -6,6 +6,7 @@ import com.hackathon.sprout.domain.application.dto.ApplicationStateResponse;
 import com.hackathon.sprout.domain.application.dto.ApplicationUpdateRequest;
 import com.hackathon.sprout.domain.application.enums.ApplicationState;
 import com.hackathon.sprout.domain.application.service.ApplicationService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ public class ApplicationController {
     private final ApplicationService applicationService;
 
     @PostMapping
+    @Tag(name = "지원 내역 등록", description = "지원 내역을 등록합니다.")
     public ResponseEntity<Long> registerApplication(@RequestBody ApplicationCreateRequest request){
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(applicationService.registerApplication(request));
