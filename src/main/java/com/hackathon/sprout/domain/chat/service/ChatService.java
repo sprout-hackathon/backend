@@ -5,7 +5,9 @@ import com.hackathon.sprout.domain.chat.domain.ChatRoom;
 import com.hackathon.sprout.domain.chat.dto.SearchCondition;
 import com.hackathon.sprout.domain.chat.dto.request.ChatMessageCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.ChatMessageInsert;
+import com.hackathon.sprout.domain.chat.dto.request.ChatRequest;
 import com.hackathon.sprout.domain.chat.dto.request.ChatRoomCreateRequest;
+import com.hackathon.sprout.domain.chat.dto.response.ChatResponse;
 import com.hackathon.sprout.domain.chat.dto.response.ChatRoomResponse;
 import com.hackathon.sprout.domain.chat.repository.ChatMessageRepository;
 import com.hackathon.sprout.domain.chat.repository.ChatRoomRepository;
@@ -17,11 +19,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import static com.hackathon.sprout.global.config.WebClientConfig.AI_BASE_URL;
 
 @Service
 @RequiredArgsConstructor
@@ -30,15 +36,19 @@ public class ChatService{
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
+    private final WebClient webClient;
 
-    public String chat(String message) {
-        //TODO : 실제 GPT API 연동
-        return "지피티 반환 내용";
+    public String chat(ChatRequest request) {
+        System.out.println(AI_BASE_URL);
+        return Objects.requireNonNull(webClient.post()
+                .uri(AI_BASE_URL + "/chat")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(ChatResponse.class).block()).response();
     }
 
     public List<String> chatForRecommendation(String message) {
         //TODO : 실제 GPT API 연동
-
         List<String> recommendationList = new ArrayList<>();
 
         recommendationList.add("요양 보호사 자격증 따는 방법");
@@ -53,7 +63,7 @@ public class ChatService{
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = (String) authentication.getPrincipal();
 
-        String reply = chat(request.getTitle());
+        String reply = chat(ChatRequest.of(request.getTitle()));
         ChatRoom chatRoom = chatRoomRepository.save(request.toEntity(reply, userRepository.findById(userId).orElseThrow()));
 
         ChatMessageInsert chatMessageInsert = ChatMessageInsert.builder()
@@ -66,8 +76,9 @@ public class ChatService{
     }
 
     public ChatMessage saveChatMessage(ChatMessageCreateRequest request) {
-        String reply = chat(request.getContent());
-        ChatRoom chatRoom = chatRoomRepository.findById(request.getChatRoomId()).get();
+        ChatRoom chatRoom = chatRoomRepository.findById(request.getChatRoomId()).orElseThrow();
+
+        String reply = chat(ChatRequest.of(chatRoom,request.getContent()));
 
         ChatMessageInsert chatMessageInsert = ChatMessageInsert.builder()
                 .chatRoom(chatRoom)
