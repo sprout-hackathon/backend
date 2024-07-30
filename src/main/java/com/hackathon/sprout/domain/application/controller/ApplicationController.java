@@ -37,11 +37,13 @@ public class ApplicationController {
     }
 
     @GetMapping("/states")
+    @Operation(description = "지원 내역 상태 목록 가져오기")
     public ResponseEntity<List<ApplicationStateResponse>> getApplicationStateList(){
         return ResponseEntity.ok(Arrays.stream(ApplicationState.values()).map(ApplicationStateResponse::new).toList());
     }
 
     @PatchMapping("/{applicationId}")
+    @Operation(description = "지원 내역 수정하기")
     public ResponseEntity<Long> updateApplication(@PathVariable Long applicationId, @RequestBody ApplicationUpdateRequest request){
         applicationService.update(applicationId, request);
         return ResponseEntity.ok(applicationId);
