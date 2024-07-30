@@ -42,7 +42,7 @@ public class ApplicationController {
         return ResponseEntity.ok(Arrays.stream(ApplicationState.values()).map(ApplicationStateResponse::new).toList());
     }
 
-    @PatchMapping("/{applicationId}")
+    @PatchMapping("/{applicationId}") 
     @Operation(description = "지원 내역 수정하기")
     public ResponseEntity<Long> updateApplication(@PathVariable Long applicationId, @RequestBody ApplicationUpdateRequest request){
         applicationService.update(applicationId, request);
