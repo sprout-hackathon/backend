@@ -31,6 +31,7 @@ public class ApplicationController {
     }
 
     @GetMapping
+    @Operation(description = "지원 내역 가져오기")
     public ResponseEntity<List<ApplicationResponse>> getApplicationList(){
         return ResponseEntity.ok(applicationService.getApplicationList().stream().map(ApplicationResponse::new).toList());
     }
