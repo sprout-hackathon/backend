@@ -8,11 +8,11 @@ import com.hackathon.sprout.domain.chat.dto.ChatMessageInsert;
 import com.hackathon.sprout.domain.chat.dto.request.ChatRequest;
 import com.hackathon.sprout.domain.chat.dto.request.ChatRoomCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.response.ChatResponse;
-import com.hackathon.sprout.domain.chat.dto.response.ChatRoomResponse;
+import com.hackathon.sprout.domain.chat.exception.ChatRoomNotFoundException;
 import com.hackathon.sprout.domain.chat.repository.ChatMessageRepository;
 import com.hackathon.sprout.domain.chat.repository.ChatRoomRepository;
+import com.hackathon.sprout.domain.user.exception.UserNotFoundException;
 import com.hackathon.sprout.domain.user.repository.UserRepository;
-import com.hackathon.sprout.domain.user.service.UserService;
 import com.hackathon.sprout.global.shared.DateUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,7 +65,7 @@ public class ChatService{
         String userId = (String) authentication.getPrincipal();
 
         String reply = chat(ChatRequest.of(request.getTitle()));
-        ChatRoom chatRoom = chatRoomRepository.save(request.toEntity(reply, userRepository.findById(userId).orElseThrow()));
+        ChatRoom chatRoom = chatRoomRepository.save(request.toEntity(reply, userRepository.findById(userId).orElseThrow(UserNotFoundException::new)));
 
         ChatMessageInsert chatMessageInsert = ChatMessageInsert.builder()
                 .chatRoom(chatRoom)
@@ -77,7 +77,7 @@ public class ChatService{
     }
 
     public ChatMessage saveChatMessage(ChatMessageCreateRequest request) {
-        ChatRoom chatRoom = chatRoomRepository.findById(request.getChatRoomId()).orElseThrow();
+        ChatRoom chatRoom = chatRoomRepository.findById(request.getChatRoomId()).orElseThrow(ChatRoomNotFoundException::new);
 
         String reply = chat(ChatRequest.of(chatRoom,request.getContent()));
 
@@ -109,7 +109,7 @@ public class ChatService{
 
     @Transactional(readOnly = true)
     public ChatRoom getChatRoom(Long roomId) {
-        return chatRoomRepository.findById(roomId).orElseThrow();
+        return chatRoomRepository.findById(roomId).orElseThrow(ChatRoomNotFoundException::new);
     }
 
     public void deleteChatRoom(Long roomId) {
