@@ -10,7 +10,7 @@ public record ChatRequestMessage (
 ){
     public static ChatRequestMessage of(ChatMessage chatMessage) {
         return ChatRequestMessage.builder()
-                .role(chatMessage.getIsBot() ? "system" : "user")
+                .role(chatMessage.getIsBot() ? "assistant" : "user")
                 .content(chatMessage.getContent())
                 .build();
     }

@@ -39,7 +39,6 @@ public class ChatService{
     private final WebClient webClient;
 
     public String chat(ChatRequest request) {
-        System.out.println(AI_BASE_URL);
         return Objects.requireNonNull(webClient.post()
                 .uri(AI_BASE_URL + "/chat")
                 .bodyValue(request)
