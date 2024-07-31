@@ -15,6 +15,7 @@ import com.hackathon.sprout.domain.user.repository.UserRepository;
 import com.hackathon.sprout.domain.user.service.UserService;
 import com.hackathon.sprout.global.shared.DateUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -27,8 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.hackathon.sprout.global.config.WebClientConfig.AI_BASE_URL;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -37,6 +36,9 @@ public class ChatService{
     private final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
     private final WebClient webClient;
+
+    @Value("${ai.base.url}")
+    public String AI_BASE_URL;
 
     public String chat(ChatRequest request) {
         return Objects.requireNonNull(webClient.post()
