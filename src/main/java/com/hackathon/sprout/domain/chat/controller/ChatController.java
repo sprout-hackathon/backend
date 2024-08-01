@@ -2,7 +2,7 @@ package com.hackathon.sprout.domain.chat.controller;
 
 import com.hackathon.sprout.domain.chat.domain.ChatMessage;
 import com.hackathon.sprout.domain.chat.domain.ImageMessage;
-import com.hackathon.sprout.domain.chat.dto.SearchCondition;
+import com.hackathon.sprout.domain.chat.dto.ChatSearchCondition;
 import com.hackathon.sprout.domain.chat.dto.request.ChatMessageCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.request.ChatRoomCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.request.ImageChatMessageCreateRequest;
@@ -27,7 +27,7 @@ public class ChatController {
     private final ImageChatService imageChatService;
 
     @GetMapping("/rooms")
-    public ResponseEntity<List<ChatRoomBasicInfoResponse>> getRoomList(@ModelAttribute SearchCondition condition){
+    public ResponseEntity<List<ChatRoomBasicInfoResponse>> getRoomList(@ModelAttribute ChatSearchCondition condition){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(chatService.getChatRoomList(condition).stream().map(ChatRoomBasicInfoResponse::new).toList());
     }

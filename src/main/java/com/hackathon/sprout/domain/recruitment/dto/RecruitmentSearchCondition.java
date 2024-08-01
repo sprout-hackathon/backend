@@ -7,6 +7,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class SearchCondition {
+public class RecruitmentSearchCondition {
     String sido = "";
 }

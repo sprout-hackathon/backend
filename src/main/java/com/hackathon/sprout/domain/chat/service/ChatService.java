@@ -2,7 +2,7 @@ package com.hackathon.sprout.domain.chat.service;
 
 import com.hackathon.sprout.domain.chat.domain.ChatMessage;
 import com.hackathon.sprout.domain.chat.domain.ChatRoom;
-import com.hackathon.sprout.domain.chat.dto.SearchCondition;
+import com.hackathon.sprout.domain.chat.dto.ChatSearchCondition;
 import com.hackathon.sprout.domain.chat.dto.request.ChatMessageCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.ChatMessageInsert;
 import com.hackathon.sprout.domain.chat.dto.request.ChatRequest;
@@ -117,7 +117,7 @@ public class ChatService{
     }
 
     @Transactional(readOnly = true)
-    public List<ChatRoom> getChatRoomList(SearchCondition condition) {
+    public List<ChatRoom> getChatRoomList(ChatSearchCondition condition) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = (String) authentication.getPrincipal();
 

@@ -4,10 +4,9 @@ import com.hackathon.sprout.domain.hospital.service.HospitalService;
 import com.hackathon.sprout.domain.recruitment.domain.Recruitment;
 import com.hackathon.sprout.domain.recruitment.domain.RecruitmentScrap;
 import com.hackathon.sprout.domain.recruitment.dto.RecruitmentCreateRequest;
-import com.hackathon.sprout.domain.recruitment.dto.SearchCondition;
+import com.hackathon.sprout.domain.recruitment.dto.RecruitmentSearchCondition;
 import com.hackathon.sprout.domain.recruitment.repository.RecruitmentRepository;
 import com.hackathon.sprout.domain.recruitment.repository.RecruitmentScrapRepository;
-import com.hackathon.sprout.domain.user.domain.User;
 import com.hackathon.sprout.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,7 +30,7 @@ public class RecruitmentService {
             .getRecruitmentId();
     }
 
-    public Page<Recruitment> getRecruitmentList(SearchCondition condition, Pageable pageable){
+    public Page<Recruitment> getRecruitmentList(RecruitmentSearchCondition condition, Pageable pageable){
         if(condition.getSido().isEmpty()){
             return recruitmentRepository.findAll(pageable);
         }else{
