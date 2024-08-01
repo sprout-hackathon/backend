@@ -2,8 +2,8 @@ package com.hackathon.sprout.domain.file.service;
 
 import com.hackathon.sprout.domain.file.domain.File;
 import com.hackathon.sprout.domain.file.repository.FileRepository;
-import com.hackathon.sprout.domain.image.domain.ImageMessage;
-import com.hackathon.sprout.domain.image.service.ImageMessageRepository;
+import com.hackathon.sprout.domain.chat.domain.ImageMessage;
+import com.hackathon.sprout.domain.chat.repository.ImageMessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ public class FileService {
     private final S3Service uploader;
 
     @Transactional
-    public void saveFiles(List<MultipartFile> requestFiles) throws IOException {
+    public List<File> saveFiles(List<MultipartFile> requestFiles){
         List<File> fileList = new ArrayList<>();
         for (MultipartFile requestFile : requestFiles) {
             String fileUrl = uploader.saveFile(requestFile);
@@ -37,11 +37,11 @@ public class FileService {
             fileList.add(file);
         }
 
-        fileRepository.saveAll(fileList);
+        return fileRepository.saveAll(fileList);
     }
 
     @Transactional
-    public void saveFiles(Long imageMessageId, List<MultipartFile> requestFiles) throws IOException {
+    public List<File> saveFiles(Long imageMessageId, List<MultipartFile> requestFiles){
         ImageMessage imageMessage = imageMessageRepository.findById(imageMessageId).orElseThrow();
 
         List<File> fileList = new ArrayList<>();
@@ -56,7 +56,7 @@ public class FileService {
             fileList.add(file);
         }
 
-        fileRepository.saveAll(fileList);
+        return fileRepository.saveAll(fileList);
     }
 
     @Transactional

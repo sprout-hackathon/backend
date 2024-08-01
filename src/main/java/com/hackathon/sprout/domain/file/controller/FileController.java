@@ -22,11 +22,7 @@ public class FileController {
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
-        try {
-            fileService.saveFiles(List.of(file));
-            return ResponseEntity.status(HttpStatus.CREATED).body("파일 업로드 성공!!");
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 업로드 실패!!");
-        }
+        fileService.saveFiles(List.of(file));
+        return ResponseEntity.status(HttpStatus.CREATED).body("파일 업로드 성공!!");
     }
 }
