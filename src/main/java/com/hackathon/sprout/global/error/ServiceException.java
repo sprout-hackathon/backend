@@ -1,6 +1,5 @@
 package com.hackathon.sprout.global.error;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
