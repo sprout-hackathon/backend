@@ -1,5 +1,6 @@
 package com.hackathon.sprout.domain.chat.controller;
 
+import com.hackathon.dto.ChatGptRequest;
 import com.hackathon.sprout.domain.chat.domain.ChatMessage;
 import com.hackathon.sprout.domain.chat.domain.ImageMessage;
 import com.hackathon.sprout.domain.chat.dto.ChatSearchCondition;
@@ -8,6 +9,7 @@ import com.hackathon.sprout.domain.chat.dto.request.ChatRoomCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.request.ImageChatMessageCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.request.ImageChatRoomCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.response.*;
+import com.hackathon.sprout.domain.chat.service.ChatGptService;
 import com.hackathon.sprout.domain.chat.service.ChatService;
 import com.hackathon.sprout.domain.chat.service.ImageChatService;
 import com.hackathon.sprout.global.error.ErrorResponse;
@@ -23,7 +25,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -32,6 +36,7 @@ import java.util.List;
 @Tag(name = "채팅", description = "채팅 관련 API")
 public class ChatController {
     private final ChatService chatService;
+    private final ChatGptService chatGptService;
     private final ImageChatService imageChatService;
 
     @Operation(summary = "채팅방 목록 조회", description = "조건에 맞는 채팅방 목록을 조회합니다.")
@@ -151,5 +156,29 @@ public class ChatController {
     public ResponseEntity<Void> deleteImageRoom(@PathVariable Long imageRoomId) {
         imageChatService.deleteChatRoom(imageRoomId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/transcribe")
+    public Mono<ResponseEntity<String>> transcribe(@RequestParam("file") MultipartFile file) throws IOException {
+        if (!file.getOriginalFilename().endsWith(".wav")) {
+            return Mono.just(ResponseEntity.badRequest().body("Only .wav files are allowed"));
+        }
+
+        byte[] audioFile = file.getBytes();
+        String fileName = file.getOriginalFilename();
+        String contentType = file.getContentType();
+
+        return chatGptService.transcribe(audioFile, fileName, contentType)
+                .map(response -> ResponseEntity.ok().body(response))
+                .onErrorResume(e -> {
+                    return Mono.just(ResponseEntity.status(500).body("An error occurred while processing your request: " + e.getMessage()));
+                });
+    }
+
+    @PostMapping
+    public Mono<ResponseEntity<String>> chat(@RequestBody ChatGptRequest request) {
+        return chatGptService.chat(request)
+                .map(response -> ResponseEntity.ok().body(response))
+                .onErrorResume(e -> Mono.just(ResponseEntity.status(500).body("An error occurred while processing your request.")));
     }
 }
