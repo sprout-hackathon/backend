@@ -1,6 +1,7 @@
 package com.hackathon.sprout.domain.chat.dto.request;
 
 import com.hackathon.sprout.domain.chat.domain.ChatRoom;
+import com.hackathon.sprout.domain.country.domain.Language;
 import lombok.*;
 
 import java.util.List;
@@ -27,6 +28,17 @@ public record ChatRequest (
         List<ChatRequestMessage> messages = Stream.concat(
                 chatRoom.getChatMessageList().stream().map(ChatRequestMessage::of),
                 Stream.of(ChatRequestMessage.of(content))
+        ).collect(Collectors.toList());
+
+        return ChatRequest.builder()
+                .messages(messages)
+                .build();
+    }
+
+    public static ChatRequest ofWithLanguage(ChatRoom chatRoom, String content) {
+        List<ChatRequestMessage> messages = Stream.concat(
+                chatRoom.getChatMessageList().stream().map(ChatRequestMessage::of),
+                Stream.of(ChatRequestMessage.of(content,chatRoom.getUser().getLanguageCode()))
         ).collect(Collectors.toList());
 
         return ChatRequest.builder()
