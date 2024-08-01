@@ -1,0 +1,68 @@
+package com.hackathon.sprout.domain.file.service;
+
+import com.amazonaws.SdkClientException;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class S3Service {
+    @Autowired
+    private final AmazonS3 amazonS3;
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
+
+    public String saveFile(MultipartFile multipartFile) {
+        String filename = createFilename(multipartFile.getOriginalFilename());
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(multipartFile.getSize());
+        metadata.setContentType(multipartFile.getContentType());
+
+        try {
+            amazonS3.putObject(bucket, filename, multipartFile.getInputStream(), metadata);
+        } catch (IOException e) {
+            throw new RuntimeException("이미지 업로드에 실패했습니다.");
+        }
+
+        return amazonS3.getUrl(bucket, filename).toString();
+    }
+
+    public String saveFileInFolder(MultipartFile multipartFile, String folder) {
+        String filename = folder + createFilename(multipartFile.getOriginalFilename());
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(multipartFile.getSize());
+        metadata.setContentType(multipartFile.getContentType());
+
+        try {
+            amazonS3.putObject(bucket, filename, multipartFile.getInputStream(), metadata);
+        } catch (IOException e) {
+            throw new RuntimeException("이미지 업로드에 실패했습니다.");
+        }
+
+        return amazonS3.getUrl(bucket, filename).toString();
+    }
+
+    public void deleteFile(String filename) {
+        try {
+            amazonS3.deleteObject(bucket, filename);
+        } catch (SdkClientException e) {
+            throw new RuntimeException("이미지 삭제에 실패했습니다");
+        }
+    }
+
+    public String createFilename(String originalFilename) {
+        return UUID.randomUUID() + "_" + originalFilename;
+    }
+
+}
