@@ -17,7 +17,7 @@ public class ImageChatMessageResponse {
 
     private final boolean isBot;
 
-    private final List<FileResponse> file;
+    private final List<FileResponse> fileList;
 
     private List<String> recommendedQuestions;
 
@@ -26,7 +26,7 @@ public class ImageChatMessageResponse {
         this.content = message.getContent();
         this.createdAt = message.getCreatedAt();
         this.isBot = message.getIsBot();
-        this.file = message.getFiles().stream().map(FileResponse::of).toList();
+        this.fileList = message.getFiles().stream().map(FileResponse::of).toList();
     }
 
     public ImageChatMessageResponse(ImageMessage message, List<String> recommendedQuestions){
@@ -34,7 +34,7 @@ public class ImageChatMessageResponse {
         this.content = message.getContent();
         this.createdAt = message.getCreatedAt();
         this.isBot = message.getIsBot();
-        this.file = message.getFiles().stream().map(FileResponse::of).toList();
+        this.fileList = message.getFiles().stream().map(FileResponse::of).toList();
         this.recommendedQuestions = recommendedQuestions;
     }
 }
