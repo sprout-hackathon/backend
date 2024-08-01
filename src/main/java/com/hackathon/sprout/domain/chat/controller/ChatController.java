@@ -10,6 +10,7 @@ import com.hackathon.sprout.domain.chat.dto.request.ImageChatRoomCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.response.*;
 import com.hackathon.sprout.domain.chat.service.ChatService;
 import com.hackathon.sprout.domain.chat.service.ImageChatService;
+import com.hackathon.sprout.global.error.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -107,7 +107,7 @@ public class ChatController {
                 .body(new ImageChatMessageInitResponse(message));
     }
 
-    @Operation(summary = "이미지방 생성", description = "새로운 이미지방을 생성합니다.")
+    @Operation(summary = "이미지 메시지 생성", description = "새로운 이미지방을 생성합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "이미지방 생성 성공", content = @Content(schema = @Schema(implementation = ChatMessageInitResponse.class))),
             @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -118,6 +118,17 @@ public class ChatController {
         ImageMessage message = imageChatService.saveChatMessage(request,fileList);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ImageChatMessageResponse(message));
+    }
+
+    @Operation(summary = "이미지방 상세 조회", description = "이미지방 번호로 이미지방 정보를 상세 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이미지방 상세 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content(schema = @Schema(implementation = com.hackathon.sprout.global.error.ErrorResponse.class))),
+    })
+    @GetMapping("/images/rooms/{imageRoomId}")
+    public ResponseEntity<ImageChatRoomResponse> getImageRoomList(@PathVariable Long imageRoomId){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ImageChatRoomResponse(imageChatService.getChatRoom(imageRoomId)));
     }
 
     @Operation(summary = "이미지방 목록 조회", description = "조건에 맞는 이미지방 목록을 조회합니다.")
