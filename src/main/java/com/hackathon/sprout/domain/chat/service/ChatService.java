@@ -2,9 +2,9 @@ package com.hackathon.sprout.domain.chat.service;
 
 import com.hackathon.sprout.domain.chat.domain.ChatMessage;
 import com.hackathon.sprout.domain.chat.domain.ChatRoom;
+import com.hackathon.sprout.domain.chat.dto.ChatMessageInsert;
 import com.hackathon.sprout.domain.chat.dto.ChatSearchCondition;
 import com.hackathon.sprout.domain.chat.dto.request.ChatMessageCreateRequest;
-import com.hackathon.sprout.domain.chat.dto.ChatMessageInsert;
 import com.hackathon.sprout.domain.chat.dto.request.ChatRequest;
 import com.hackathon.sprout.domain.chat.dto.request.ChatRoomCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.response.ChatResponse;
@@ -31,7 +31,7 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class ChatService{
+public class ChatService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
@@ -79,7 +79,7 @@ public class ChatService{
     public ChatMessage saveChatMessage(ChatMessageCreateRequest request) {
         ChatRoom chatRoom = chatRoomRepository.findById(request.getChatRoomId()).orElseThrow(ChatRoomNotFoundException::new);
 
-        String reply = chat(ChatRequest.of(chatRoom,request.getContent()));
+        String reply = chat(ChatRequest.of(chatRoom, request.getContent()));
 
         ChatMessageInsert chatMessageInsert = ChatMessageInsert.builder()
                 .chatRoom(chatRoom)
@@ -90,7 +90,7 @@ public class ChatService{
         return saveChatMessage(chatMessageInsert);
     }
 
-    public ChatMessage saveChatMessage(ChatMessageInsert dto){
+    public ChatMessage saveChatMessage(ChatMessageInsert dto) {
         ChatMessage sendMessage = ChatMessage.builder()
                 .chatRoom(dto.getChatRoom())
                 .content(dto.getSendMessage())
@@ -121,10 +121,10 @@ public class ChatService{
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = (String) authentication.getPrincipal();
 
-        LocalDate localDate = DateUtil.convertToLocalDate(condition.date());
+        LocalDate localDate = DateUtil.convertToLocalDate(condition.getDate());
         LocalDateTime startDate = DateUtil.toStartOfDay(localDate);
         LocalDateTime endDate = DateUtil.toEndOfDay(localDate);
 
-        return chatRoomRepository.findByUser_IdAndCreatedAtBetween(userId,startDate,endDate);
+        return chatRoomRepository.findByUser_IdAndCreatedAtBetween(userId, startDate, endDate);
     }
 }
