@@ -1,6 +1,6 @@
 package com.hackathon.sprout.domain.file.domain;
 
-import com.hackathon.sprout.domain.image.domain.ImageMessage;
+import com.hackathon.sprout.domain.chat.domain.ImageMessage;
 import com.hackathon.sprout.global.shared.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;

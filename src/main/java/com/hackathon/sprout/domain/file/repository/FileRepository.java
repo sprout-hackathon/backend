@@ -1,7 +1,7 @@
 package com.hackathon.sprout.domain.file.repository;
 
 import com.hackathon.sprout.domain.file.domain.File;
-import com.hackathon.sprout.domain.image.domain.ImageMessage;
+import com.hackathon.sprout.domain.chat.domain.ImageMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

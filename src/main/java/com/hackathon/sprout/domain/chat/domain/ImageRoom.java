@@ -1,4 +1,4 @@
-package com.hackathon.sprout.domain.image.domain;
+package com.hackathon.sprout.domain.chat.domain;
 
 import com.hackathon.sprout.domain.user.domain.User;
 import com.hackathon.sprout.global.shared.BaseTimeEntity;
@@ -17,7 +17,6 @@ import java.util.List;
 public class ImageRoom extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
     private Long imageRoomId;
 
     @Column

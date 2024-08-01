@@ -1,6 +1,6 @@
-package com.hackathon.sprout.domain.image.service;
+package com.hackathon.sprout.domain.chat.repository;
 
-import com.hackathon.sprout.domain.image.domain.ImageRoom;
+import com.hackathon.sprout.domain.chat.domain.ImageRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

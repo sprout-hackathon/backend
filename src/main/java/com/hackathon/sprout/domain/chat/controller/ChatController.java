@@ -1,18 +1,20 @@
 package com.hackathon.sprout.domain.chat.controller;
 
 import com.hackathon.sprout.domain.chat.domain.ChatMessage;
+import com.hackathon.sprout.domain.chat.domain.ImageMessage;
 import com.hackathon.sprout.domain.chat.dto.SearchCondition;
 import com.hackathon.sprout.domain.chat.dto.request.ChatMessageCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.request.ChatRoomCreateRequest;
-import com.hackathon.sprout.domain.chat.dto.response.ChatMessageInitResponse;
-import com.hackathon.sprout.domain.chat.dto.response.ChatMessageResponse;
-import com.hackathon.sprout.domain.chat.dto.response.ChatRoomBasicInfoResponse;
-import com.hackathon.sprout.domain.chat.dto.response.ChatRoomResponse;
+import com.hackathon.sprout.domain.chat.dto.request.ImageChatRoomCreateRequest;
+import com.hackathon.sprout.domain.chat.dto.response.*;
 import com.hackathon.sprout.domain.chat.service.ChatService;
+import com.hackathon.sprout.domain.chat.service.ImageChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,6 +23,7 @@ import java.util.List;
 @RequestMapping("/api/chats")
 public class ChatController {
     private final ChatService chatService;
+    private final ImageChatService imageChatService;
 
     @GetMapping("/rooms")
     public ResponseEntity<List<ChatRoomBasicInfoResponse>> getRoomList(@ModelAttribute SearchCondition condition){
@@ -52,5 +55,14 @@ public class ChatController {
     public ResponseEntity<Void> deleteRoom(@PathVariable Long roomId) {
         chatService.deleteChatRoom(roomId);
         return ResponseEntity.noContent().build();
+    }
+
+    /* 이미지 채팅 */
+
+    @PostMapping(value = "/images/rooms", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ImageChatMessageInitResponse> createRoom(@RequestPart ImageChatRoomCreateRequest request, @RequestPart List<MultipartFile> fileList){
+        ImageMessage message = imageChatService.createChatRoom(request,fileList);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ImageChatMessageInitResponse(message));
     }
 }
