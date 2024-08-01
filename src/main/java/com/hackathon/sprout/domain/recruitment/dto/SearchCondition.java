@@ -1,5 +1,6 @@
 package com.hackathon.sprout.domain.recruitment.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 @Getter
@@ -8,5 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 public class SearchCondition {
+    @Schema(description = "시도", example = "서울")
     String sido = "";
 }
