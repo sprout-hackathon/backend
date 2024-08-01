@@ -5,6 +5,7 @@ import com.hackathon.sprout.domain.chat.domain.ImageMessage;
 import com.hackathon.sprout.domain.chat.dto.SearchCondition;
 import com.hackathon.sprout.domain.chat.dto.request.ChatMessageCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.request.ChatRoomCreateRequest;
+import com.hackathon.sprout.domain.chat.dto.request.ImageChatMessageCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.request.ImageChatRoomCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.response.*;
 import com.hackathon.sprout.domain.chat.service.ChatService;
@@ -58,11 +59,17 @@ public class ChatController {
     }
 
     /* 이미지 채팅 */
-
     @PostMapping(value = "/images/rooms", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ImageChatMessageInitResponse> createRoom(@RequestPart ImageChatRoomCreateRequest request, @RequestPart List<MultipartFile> fileList){
         ImageMessage message = imageChatService.createChatRoom(request,fileList);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ImageChatMessageInitResponse(message));
+    }
+
+    @PostMapping(value = "/images/messages", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ImageChatMessageResponse> createMessage(@RequestPart ImageChatMessageCreateRequest request, @RequestPart List<MultipartFile> fileList){
+        ImageMessage message = imageChatService.saveChatMessage(request,fileList);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ImageChatMessageResponse(message));
     }
 }

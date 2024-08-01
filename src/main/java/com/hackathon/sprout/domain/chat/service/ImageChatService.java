@@ -1,11 +1,14 @@
 package com.hackathon.sprout.domain.chat.service;
 
+import com.hackathon.sprout.domain.chat.domain.ChatMessage;
+import com.hackathon.sprout.domain.chat.domain.ChatRoom;
 import com.hackathon.sprout.domain.chat.domain.ImageMessage;
 import com.hackathon.sprout.domain.chat.domain.ImageRoom;
+import com.hackathon.sprout.domain.chat.dto.ChatMessageInsert;
 import com.hackathon.sprout.domain.chat.dto.ImageChatMessageInsert;
-import com.hackathon.sprout.domain.chat.dto.request.ImageChatRequest;
-import com.hackathon.sprout.domain.chat.dto.request.ImageChatRoomCreateRequest;
+import com.hackathon.sprout.domain.chat.dto.request.*;
 import com.hackathon.sprout.domain.chat.dto.response.ChatResponse;
+import com.hackathon.sprout.domain.chat.exception.ChatRoomNotFoundException;
 import com.hackathon.sprout.domain.chat.repository.ImageMessageRepository;
 import com.hackathon.sprout.domain.chat.repository.ImageRoomRepository;
 import com.hackathon.sprout.domain.file.domain.File;
@@ -55,6 +58,26 @@ public class ImageChatService {
         recommendationList.add("외국인 요양보호사가 되려면?");
 
         return recommendationList;
+    }
+
+    public ImageMessage saveChatMessage(ImageChatMessageCreateRequest request, List<MultipartFile> imageFileList) {
+        ImageRoom imageRoom = imageRoomRepository.findById(request.imageRoomId()).orElseThrow(ChatRoomNotFoundException::new);
+
+        // 이미지 S3에 저장
+        List<File> savedFileList = fileService.saveFiles(imageFileList);
+
+        // 이미지와 프롬프트 챗봇에게 전달 후 답변 받아옴
+        String reply = chat(ImageChatRequest.of(request.content(), savedFileList));
+
+        // 이미지 채팅방에 채팅 및 답변 등록
+        ImageChatMessageInsert chatMessageInsert = ImageChatMessageInsert.builder()
+                .imageRoom(imageRoom)
+                .sendMessage(request.content())
+                .imageFileList(savedFileList)
+                .replyMessage(reply)
+                .build();
+
+        return saveChatMessage(chatMessageInsert);
     }
 
     public ImageMessage createChatRoom(ImageChatRoomCreateRequest request, List<MultipartFile> imageFileList){
