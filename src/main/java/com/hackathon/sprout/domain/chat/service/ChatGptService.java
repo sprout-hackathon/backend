@@ -18,6 +18,6 @@ public class ChatGptService {
 
     public Mono<String> transcribe(byte[] audioFile, String fileName, String contentType) {
         return openAIService.transcribe(audioFile, fileName, contentType)
-                .flatMap(transcriptionText -> openAIService.transcribeAndTranslate(transcriptionText));
+                .flatMap(openAIService::transcribeAndTranslate);
     }
 }

@@ -29,6 +29,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -158,9 +159,14 @@ public class ChatController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/transcribe")
-    public Mono<ResponseEntity<String>> transcribe(@RequestParam("file") MultipartFile file) throws IOException {
-        if (!file.getOriginalFilename().endsWith(".wav")) {
+    @Operation(summary = "음성 번역 및 사투리 교정", description = "음성 번역 및 사투리 교정")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "음성 번역 및 사투리 교정 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
+    @PostMapping(value = "/transcribe",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Mono<ResponseEntity<String>> transcribe(@RequestPart("file") MultipartFile file) throws IOException {
+        if (!Objects.requireNonNull(file.getOriginalFilename()).endsWith(".wav")) {
             return Mono.just(ResponseEntity.badRequest().body("Only .wav files are allowed"));
         }
 
@@ -170,15 +176,13 @@ public class ChatController {
 
         return chatGptService.transcribe(audioFile, fileName, contentType)
                 .map(response -> ResponseEntity.ok().body(response))
-                .onErrorResume(e -> {
-                    return Mono.just(ResponseEntity.status(500).body("An error occurred while processing your request: " + e.getMessage()));
-                });
+                .onErrorResume(e -> Mono.just(ResponseEntity.status(500).body("An error occurred while processing your request: " + e.getMessage())));
     }
-
-    @PostMapping
-    public Mono<ResponseEntity<String>> chat(@RequestBody ChatGptRequest request) {
-        return chatGptService.chat(request)
-                .map(response -> ResponseEntity.ok().body(response))
-                .onErrorResume(e -> Mono.just(ResponseEntity.status(500).body("An error occurred while processing your request.")));
-    }
+//
+//    @PostMapping
+//    public Mono<ResponseEntity<String>> chat(@RequestBody ChatGptRequest request) {
+//        return chatGptService.chat(request)
+//                .map(response -> ResponseEntity.ok().body(response))
+//                .onErrorResume(e -> Mono.just(ResponseEntity.status(500).body("An error occurred while processing your request.")));
+//    }
 }
