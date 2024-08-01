@@ -1,7 +1,7 @@
 package com.hackathon.sprout.domain.chat.dto.response;
 
-import com.hackathon.sprout.domain.chat.domain.ChatMessage;
 import com.hackathon.sprout.domain.chat.domain.ImageMessage;
+import com.hackathon.sprout.domain.file.dto.FileResponse;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -17,6 +17,8 @@ public class ImageChatMessageResponse {
 
     private final boolean isBot;
 
+    private final List<FileResponse> file;
+
     private List<String> recommendedQuestions;
 
     public ImageChatMessageResponse(ImageMessage message){
@@ -24,6 +26,7 @@ public class ImageChatMessageResponse {
         this.content = message.getContent();
         this.createdAt = message.getCreatedAt();
         this.isBot = message.getIsBot();
+        this.file = message.getFiles().stream().map(FileResponse::of).toList();
     }
 
     public ImageChatMessageResponse(ImageMessage message, List<String> recommendedQuestions){
@@ -31,6 +34,7 @@ public class ImageChatMessageResponse {
         this.content = message.getContent();
         this.createdAt = message.getCreatedAt();
         this.isBot = message.getIsBot();
+        this.file = message.getFiles().stream().map(FileResponse::of).toList();
         this.recommendedQuestions = recommendedQuestions;
     }
 }
