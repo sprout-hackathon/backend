@@ -10,17 +10,20 @@ import java.util.stream.Stream;
 
 @Builder
 public record ImageChatRequest(
-    List<ImageChatRequestMessage> messages
+        Boolean hasImage,
+        List<ImageChatRequestMessage> messages
 ){
     public static ImageChatRequest of(String content, List<File> imageFileList) {
         return ImageChatRequest.builder()
                 .messages(List.of(ImageChatRequestMessage.of(content, imageFileList)))
+                .hasImage(true)
                 .build();
     }
 
     public static ImageChatRequest of(ImageRoom imageRoom) {
         return ImageChatRequest.builder()
                 .messages(imageRoom.getImageMessageList().stream().map(ImageChatRequestMessage::of).toList())
+                .hasImage(true)
                 .build();
     }
 
@@ -32,6 +35,7 @@ public record ImageChatRequest(
 
         return ImageChatRequest.builder()
                 .messages(messages)
+                .hasImage(true)
                 .build();
     }
 }

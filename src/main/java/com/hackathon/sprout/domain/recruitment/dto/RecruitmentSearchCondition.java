@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class SearchCondition {
+public class RecruitmentSearchCondition {
     @Schema(description = "시도", example = "서울")
     String sido = "";
 }

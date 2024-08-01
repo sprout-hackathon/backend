@@ -1,11 +1,14 @@
 package com.hackathon.sprout.domain.chat.service;
 
+import com.hackathon.sprout.domain.chat.domain.ChatMessage;
+import com.hackathon.sprout.domain.chat.domain.ChatRoom;
 import com.hackathon.sprout.domain.chat.domain.ImageMessage;
 import com.hackathon.sprout.domain.chat.domain.ImageRoom;
+import com.hackathon.sprout.domain.chat.dto.ChatMessageInsert;
 import com.hackathon.sprout.domain.chat.dto.ImageChatMessageInsert;
-import com.hackathon.sprout.domain.chat.dto.request.ImageChatRequest;
-import com.hackathon.sprout.domain.chat.dto.request.ImageChatRoomCreateRequest;
+import com.hackathon.sprout.domain.chat.dto.request.*;
 import com.hackathon.sprout.domain.chat.dto.response.ChatResponse;
+import com.hackathon.sprout.domain.chat.exception.ChatRoomNotFoundException;
 import com.hackathon.sprout.domain.chat.repository.ImageMessageRepository;
 import com.hackathon.sprout.domain.chat.repository.ImageRoomRepository;
 import com.hackathon.sprout.domain.file.domain.File;
@@ -57,6 +60,21 @@ public class ImageChatService {
         return recommendationList;
     }
 
+    public ImageMessage saveChatMessage(ImageChatMessageCreateRequest request, List<MultipartFile> imageFileList) {
+        ImageRoom imageRoom = imageRoomRepository.findById(request.imageRoomId()).orElseThrow(ChatRoomNotFoundException::new);
+
+        // 이미지 채팅방에 채팅 등록
+        ImageMessage sendMessage = saveChatMessage(imageRoom, imageRoom.getTitle(), true);
+
+        // 이미지 S3에 저장
+        List<File> savedFileList = fileService.saveFiles(sendMessage.getImageMessageId(), imageFileList);
+
+        // 이미지와 프롬프트 챗봇에게 전달 후 답변 받아옴
+        String reply = chat(ImageChatRequest.of(request.content(), savedFileList));
+
+        return saveChatMessage(imageRoom, reply, true);
+    }
+
     public ImageMessage createChatRoom(ImageChatRoomCreateRequest request, List<MultipartFile> imageFileList){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = (String) authentication.getPrincipal();
@@ -64,38 +82,30 @@ public class ImageChatService {
         // 이미지 채팅방 생성
         ImageRoom imageRoom = imageRoomRepository.save(request.toEntity(userRepository.findById(userId).orElseThrow(UserNotFoundException::new)));
 
+        // 이미지 채팅방에 채팅 등록
+        ImageMessage sendMessage = saveChatMessage(imageRoom, imageRoom.getTitle(), true);
+
         // 이미지 S3에 저장
-        List<File> savedFileList = fileService.saveFiles(imageFileList);
+        List<File> savedFileList = fileService.saveFiles(sendMessage.getImageMessageId(), imageFileList);
 
         // 이미지와 프롬프트 챗봇에게 전달 후 답변 받아옴
         String reply = chat(ImageChatRequest.of(request.title(), savedFileList));
 
-        // 이미지 채팅방에 채팅 및 답변 등록
-        ImageChatMessageInsert chatMessageInsert = ImageChatMessageInsert.builder()
-                .imageRoom(imageRoom)
-                .sendMessage(request.title())
-                .imageFileList(savedFileList)
-                .replyMessage(reply)
-                .build();
-
-        return saveChatMessage(chatMessageInsert);
+        return saveChatMessage(imageRoom, reply, true);
     }
 
-    public ImageMessage saveChatMessage(ImageChatMessageInsert dto){
+    public ImageMessage saveChatMessage(ImageRoom imageRoom, String content, Boolean isBot){
         ImageMessage sendMessage = ImageMessage.builder()
-                .imageRoom(dto.getImageRoom())
-                .content(dto.getSendMessage())
-                .isBot(false)
-                .files(dto.getImageFileList())
+                .imageRoom(imageRoom)
+                .content(content)
+                .isBot(isBot)
                 .build();
 
-        ImageMessage replyMessage = ImageMessage.builder()
-                .imageRoom(dto.getImageRoom())
-                .content(dto.getReplyMessage())
-                .isBot(true)
-                .build();
+        return imageMessageRepository.save(sendMessage);
+    }
 
-        imageMessageRepository.save(sendMessage);
-        return imageMessageRepository.save(replyMessage);
+    @Transactional(readOnly = true)
+    public ImageRoom getChatRoom(Long roomId) {
+        return imageRoomRepository.findById(roomId).orElseThrow(ChatRoomNotFoundException::new);
     }
 }

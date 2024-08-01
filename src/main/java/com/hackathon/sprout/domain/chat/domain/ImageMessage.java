@@ -30,5 +30,6 @@ public class ImageMessage extends BaseTimeEntity {
     private Boolean isBot;
 
     @OneToMany(mappedBy = "imageMessage", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<File> files = new ArrayList<>();
 }

@@ -3,7 +3,7 @@ package com.hackathon.sprout.domain.recruitment.controller;
 import com.hackathon.sprout.domain.recruitment.dto.RecruitmentCreateRequest;
 import com.hackathon.sprout.domain.recruitment.dto.RecruitmentResponse;
 import com.hackathon.sprout.domain.recruitment.dto.RecruitmentScrapResponse;
-import com.hackathon.sprout.domain.recruitment.dto.SearchCondition;
+import com.hackathon.sprout.domain.recruitment.dto.RecruitmentSearchCondition;
 import com.hackathon.sprout.domain.recruitment.service.RecruitmentService;
 import com.hackathon.sprout.domain.user.domain.User;
 import com.hackathon.sprout.domain.user.service.UserService;
@@ -51,9 +51,9 @@ public class RecruitmentController {
     })
     @GetMapping
     public ResponseEntity<Page<RecruitmentResponse>> searchRecruitment(
-            @ModelAttribute final SearchCondition condition,
-            @PageableDefault(size = 10) Pageable pageable
-    ) {
+        @ModelAttribute final RecruitmentSearchCondition condition,
+        @PageableDefault(size = 10) Pageable pageable
+    ){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(recruitmentService.getRecruitmentList(condition, pageable).map(RecruitmentResponse::new));
     }

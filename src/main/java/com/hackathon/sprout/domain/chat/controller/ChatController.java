@@ -2,9 +2,10 @@ package com.hackathon.sprout.domain.chat.controller;
 
 import com.hackathon.sprout.domain.chat.domain.ChatMessage;
 import com.hackathon.sprout.domain.chat.domain.ImageMessage;
-import com.hackathon.sprout.domain.chat.dto.SearchCondition;
+import com.hackathon.sprout.domain.chat.dto.ChatSearchCondition;
 import com.hackathon.sprout.domain.chat.dto.request.ChatMessageCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.request.ChatRoomCreateRequest;
+import com.hackathon.sprout.domain.chat.dto.request.ImageChatMessageCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.request.ImageChatRoomCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.response.*;
 import com.hackathon.sprout.domain.chat.service.ChatService;
@@ -39,7 +40,7 @@ public class ChatController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
     @GetMapping("/rooms")
-    public ResponseEntity<List<ChatRoomBasicInfoResponse>> getRoomList(@ModelAttribute SearchCondition condition) {
+    public ResponseEntity<List<ChatRoomBasicInfoResponse>> getRoomList(@ModelAttribute ChatSearchCondition condition) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(chatService.getChatRoomList(condition).stream().map(ChatRoomBasicInfoResponse::new).toList());
     }
@@ -93,11 +94,29 @@ public class ChatController {
     }
 
     /* 이미지 채팅 */
-
     @PostMapping(value = "/images/rooms", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ImageChatMessageInitResponse> createRoom(@RequestPart ImageChatRoomCreateRequest request, @RequestPart List<MultipartFile> fileList){
+    public ResponseEntity<ImageChatMessageInitResponse> createImageRoom(@RequestPart ImageChatRoomCreateRequest request, @RequestPart List<MultipartFile> fileList){
         ImageMessage message = imageChatService.createChatRoom(request,fileList);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ImageChatMessageInitResponse(message));
+    }
+
+    @PostMapping(value = "/images/messages", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ImageChatMessageResponse> createImageMessage(@RequestPart ImageChatMessageCreateRequest request, @RequestPart List<MultipartFile> fileList){
+        ImageMessage message = imageChatService.saveChatMessage(request,fileList);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ImageChatMessageResponse(message));
+    }
+
+//    @GetMapping("/images/rooms")
+//    public ResponseEntity<List<ChatRoomBasicInfoResponse>> getImageRoomList(@ModelAttribute SearchCondition condition){
+//        return ResponseEntity.status(HttpStatus.OK)
+//                .body(imageChatService.getChatRoomList(condition).stream().map(ChatRoomBasicInfoResponse::new).toList());
+//    }
+
+    @GetMapping("/images/rooms/{imageRoomId}")
+    public ResponseEntity<ImageChatRoomResponse> getImageRoomList(@PathVariable Long imageRoomId){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ImageChatRoomResponse(imageChatService.getChatRoom(imageRoomId)));
     }
 }
