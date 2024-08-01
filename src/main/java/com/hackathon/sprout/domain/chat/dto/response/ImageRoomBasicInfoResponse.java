@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 public class ImageRoomBasicInfoResponse {
@@ -17,9 +18,13 @@ public class ImageRoomBasicInfoResponse {
     @Schema(description = "채팅방 생성 시간")
     private final LocalDateTime createdAt;
 
-    public ImageRoomBasicInfoResponse(ImageRoom imageRoom) {
+    @Schema(description = "이미지 URL 리스트")
+    private final List<String> imageUrls;
+
+    public ImageRoomBasicInfoResponse(ImageRoom imageRoom, List<String> imageUrls) {
         this.imageRoomId = imageRoom.getImageRoomId();
         this.title = imageRoom.getTitle();
         this.createdAt = imageRoom.getCreatedAt();
+        this.imageUrls = imageUrls;
     }
 }

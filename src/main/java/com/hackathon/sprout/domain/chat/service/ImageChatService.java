@@ -3,8 +3,11 @@ package com.hackathon.sprout.domain.chat.service;
 import com.hackathon.sprout.domain.chat.domain.ImageMessage;
 import com.hackathon.sprout.domain.chat.domain.ImageRoom;
 import com.hackathon.sprout.domain.chat.dto.ChatSearchCondition;
-import com.hackathon.sprout.domain.chat.dto.request.*;
+import com.hackathon.sprout.domain.chat.dto.request.ImageChatMessageCreateRequest;
+import com.hackathon.sprout.domain.chat.dto.request.ImageChatRequest;
+import com.hackathon.sprout.domain.chat.dto.request.ImageChatRoomCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.response.ChatResponse;
+import com.hackathon.sprout.domain.chat.dto.response.ImageRoomBasicInfoResponse;
 import com.hackathon.sprout.domain.chat.exception.ChatRoomNotFoundException;
 import com.hackathon.sprout.domain.chat.repository.ImageMessageRepository;
 import com.hackathon.sprout.domain.chat.repository.ImageRoomRepository;
@@ -51,13 +54,10 @@ public class ImageChatService {
     }
 
     public List<String> chatForRecommendation(String message) {
-        //TODO : 실제 GPT API 연동
         List<String> recommendationList = new ArrayList<>();
-
         recommendationList.add("요양 보호사 자격증 따는 방법");
         recommendationList.add("요양 보호사의 힘든 점");
         recommendationList.add("외국인 요양보호사가 되려면?");
-
         return recommendationList;
     }
 
@@ -69,7 +69,7 @@ public class ImageChatService {
         ImageRoom imageRoom = imageRoomRepository.findById(request.imageRoomId()).orElseThrow(ChatRoomNotFoundException::new);
 
         // 이미지 채팅방에 채팅 등록
-        ImageMessage sendMessage = saveChatMessage(imageRoom, imageRoom.getTitle(), true);
+        ImageMessage sendMessage = saveChatMessage(imageRoom, request.content(), false);
 
         // 이미지 S3에 저장
         List<File> savedFileList = fileService.saveFiles(sendMessage.getImageMessageId(), imageFileList);
@@ -85,23 +85,21 @@ public class ImageChatService {
         String userId = (String) authentication.getPrincipal();
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
-        // 이미지 채팅방 생성
-        ImageRoom imageRoom = imageRoomRepository.save(request.toEntity(userRepository.findById(userId).orElseThrow(UserNotFoundException::new)));
+        ImageRoom imageRoom = imageRoomRepository.save(request.toEntity(user));
 
-        // 이미지 채팅방에 채팅 등록
-        ImageMessage sendMessage = saveChatMessage(imageRoom, imageRoom.getTitle(), true);
+        ImageMessage sendMessage = saveChatMessage(imageRoom, request.title(), false);
 
-        // 이미지 S3에 저장
         List<File> savedFileList = fileService.saveFiles(sendMessage.getImageMessageId(), imageFileList);
 
         // 이미지와 프롬프트 챗봇에게 전달 후 답변 받아옴
         String reply = chat(ImageChatRequest.ofWithLanguage(request.title(), savedFileList, user.getLanguageCode()));
 
-        return saveChatMessage(imageRoom, reply, true);
+        saveChatMessage(imageRoom, reply, true);
+
+        return sendMessage;
     }
 
-    public ImageMessage saveChatMessage(ImageRoom imageRoom, String content, Boolean isBot){
-
+    public ImageMessage saveChatMessage(ImageRoom imageRoom, String content, Boolean isBot) {
         ImageMessage sendMessage = ImageMessage.builder()
                 .imageRoom(imageRoom)
                 .content(content)
@@ -130,5 +128,23 @@ public class ImageChatService {
         LocalDateTime endDate = DateUtil.toEndOfDay(localDate);
 
         return imageRoomRepository.findByUser_IdAndCreatedAtBetween(userId, startDate, endDate);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ImageRoomBasicInfoResponse> getImageRoomsWithUrls(ChatSearchCondition condition) {
+        List<ImageRoom> imageRooms = getImageRoomList(condition);
+        List<ImageRoomBasicInfoResponse> responseList = new ArrayList<>();
+
+        for (ImageRoom imageRoom : imageRooms) {
+            List<String> imageUrls = new ArrayList<>();
+            for (ImageMessage imageMessage : imageRoom.getImageMessageList()) {
+                for (File file : imageMessage.getFiles()) {
+                    imageUrls.add(file.getUrl());
+                }
+            }
+            responseList.add(new ImageRoomBasicInfoResponse(imageRoom, imageUrls));
+        }
+
+        return responseList;
     }
 }

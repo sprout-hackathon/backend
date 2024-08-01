@@ -114,8 +114,8 @@ public class ChatController {
             @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping(value = "/images/messages", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ImageChatMessageResponse> createImageMessage(@RequestPart ImageChatMessageCreateRequest request, @RequestPart List<MultipartFile> fileList){
-        ImageMessage message = imageChatService.saveChatMessage(request,fileList);
+    public ResponseEntity<ImageChatMessageResponse> createImageMessage(@RequestPart ImageChatMessageCreateRequest request, @RequestPart List<MultipartFile> fileList) {
+        ImageMessage message = imageChatService.saveChatMessage(request, fileList);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ImageChatMessageResponse(message));
     }
@@ -126,7 +126,7 @@ public class ChatController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content(schema = @Schema(implementation = com.hackathon.sprout.global.error.ErrorResponse.class))),
     })
     @GetMapping("/images/rooms/{imageRoomId}")
-    public ResponseEntity<ImageChatRoomResponse> getImageRoomList(@PathVariable Long imageRoomId){
+    public ResponseEntity<ImageChatRoomResponse> getImageRoomList(@PathVariable Long imageRoomId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ImageChatRoomResponse(imageChatService.getChatRoom(imageRoomId)));
     }
@@ -139,7 +139,7 @@ public class ChatController {
     @GetMapping("/images/rooms")
     public ResponseEntity<List<ImageRoomBasicInfoResponse>> getImageRoomList(@ModelAttribute ChatSearchCondition condition) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(imageChatService.getImageRoomList(condition).stream().map(ImageRoomBasicInfoResponse::new).toList());
+                .body(imageChatService.getImageRoomsWithUrls(condition));
     }
 
     @Operation(summary = "이미지방 삭제", description = "특정 이미지방을 삭제합니다.")
