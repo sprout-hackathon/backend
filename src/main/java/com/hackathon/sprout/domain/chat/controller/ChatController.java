@@ -107,6 +107,12 @@ public class ChatController {
                 .body(new ImageChatMessageInitResponse(message));
     }
 
+    @Operation(summary = "이미지방 생성", description = "새로운 이미지방을 생성합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "이미지방 생성 성공", content = @Content(schema = @Schema(implementation = ChatMessageInitResponse.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PostMapping(value = "/images/messages", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ImageChatMessageResponse> createImageMessage(@RequestPart ImageChatMessageCreateRequest request, @RequestPart List<MultipartFile> fileList){
         ImageMessage message = imageChatService.saveChatMessage(request,fileList);
