@@ -1,5 +1,6 @@
 package com.hackathon.sprout.domain.board.domain;
 
+import com.hackathon.sprout.domain.board.enums.BoardType;
 import com.hackathon.sprout.domain.user.domain.User;
 import com.hackathon.sprout.global.shared.BaseTimeEntity;
 import jakarta.persistence.*;
