@@ -81,4 +81,14 @@ public class UserController {
         UserResponse userResponse = userService.getUser(authentication);
         return ResponseEntity.status(200).body(userResponse);
     }
+    @Operation(summary = "로그아웃", description = "사용자가 로그아웃을 합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "로그아웃 성공"),
+            @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/logout")
+    public ResponseEntity<Void> logout(Authentication authentication) {
+        userService.removeRefreshToken(authentication);
+        return ResponseEntity.noContent().build();
+    }
 }

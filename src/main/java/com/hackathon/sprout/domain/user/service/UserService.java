@@ -154,4 +154,13 @@ public class UserService {
                 .certificationCode(user.getCertificationCode())
                 .build();
     }
+
+    @Transactional
+    public void removeRefreshToken(Authentication authentication) {
+        String userId = (String) authentication.getPrincipal();
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        user.setRefreshToken(null);
+        userRepository.save(user);
+    }
+
 }
