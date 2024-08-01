@@ -4,7 +4,7 @@ import com.hackathon.sprout.domain.chat.domain.ChatMessage;
 import com.hackathon.sprout.domain.chat.domain.ChatRoom;
 import com.hackathon.sprout.domain.chat.domain.ImageMessage;
 import com.hackathon.sprout.domain.chat.domain.ImageRoom;
-import com.hackathon.sprout.domain.chat.dto.ChatMessageInsert;
+import com.hackathon.sprout.domain.chat.dto.ChatSearchCondition;
 import com.hackathon.sprout.domain.chat.dto.ImageChatMessageInsert;
 import com.hackathon.sprout.domain.chat.dto.request.*;
 import com.hackathon.sprout.domain.chat.dto.response.ChatResponse;
@@ -15,6 +15,7 @@ import com.hackathon.sprout.domain.file.domain.File;
 import com.hackathon.sprout.domain.file.service.FileService;
 import com.hackathon.sprout.domain.user.exception.UserNotFoundException;
 import com.hackathon.sprout.domain.user.repository.UserRepository;
+import com.hackathon.sprout.global.shared.DateUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -24,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -75,7 +78,7 @@ public class ImageChatService {
         return saveChatMessage(imageRoom, reply, true);
     }
 
-    public ImageMessage createChatRoom(ImageChatRoomCreateRequest request, List<MultipartFile> imageFileList){
+    public ImageMessage createChatRoom(ImageChatRoomCreateRequest request, List<MultipartFile> imageFileList) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = (String) authentication.getPrincipal();
 
@@ -95,6 +98,7 @@ public class ImageChatService {
     }
 
     public ImageMessage saveChatMessage(ImageRoom imageRoom, String content, Boolean isBot){
+
         ImageMessage sendMessage = ImageMessage.builder()
                 .imageRoom(imageRoom)
                 .content(content)
@@ -107,5 +111,21 @@ public class ImageChatService {
     @Transactional(readOnly = true)
     public ImageRoom getChatRoom(Long roomId) {
         return imageRoomRepository.findById(roomId).orElseThrow(ChatRoomNotFoundException::new);
+    }
+
+    public void deleteChatRoom(Long imageRoomId) {
+        imageRoomRepository.deleteById(imageRoomId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ImageRoom> getImageRoomList(ChatSearchCondition condition) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = (String) authentication.getPrincipal();
+
+        LocalDate localDate = DateUtil.convertToLocalDate(condition.getDate());
+        LocalDateTime startDate = DateUtil.toStartOfDay(localDate);
+        LocalDateTime endDate = DateUtil.toEndOfDay(localDate);
+
+        return imageRoomRepository.findByUser_IdAndCreatedAtBetween(userId, startDate, endDate);
     }
 }
