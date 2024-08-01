@@ -12,6 +12,6 @@ import lombok.Setter;
 public class BoardRequest {
     private String title;
     private String content;
-    private String category;
+    private BoardType category;
     private Boolean isAnonymous;
 }

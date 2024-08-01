@@ -25,7 +25,8 @@ public class Board extends BaseTimeEntity {
     private String content;
 
     @Column
-    private String category;
+    @Enumerated(EnumType.STRING)
+    private BoardType category;
 
     @Column
     private Integer views;

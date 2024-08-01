@@ -15,7 +15,7 @@ public class BoardDetailResponse {
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String category;
+    private BoardType category;
     private Integer views;
     private Long userId;
     private Boolean isAnonymous;
