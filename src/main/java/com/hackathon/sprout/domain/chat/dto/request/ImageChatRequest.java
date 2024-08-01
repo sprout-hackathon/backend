@@ -1,6 +1,7 @@
 package com.hackathon.sprout.domain.chat.dto.request;
 
 import com.hackathon.sprout.domain.chat.domain.ImageRoom;
+import com.hackathon.sprout.domain.country.domain.Language;
 import com.hackathon.sprout.domain.file.domain.File;
 import lombok.Builder;
 
@@ -16,6 +17,13 @@ public record ImageChatRequest(
     public static ImageChatRequest of(String content, List<File> imageFileList) {
         return ImageChatRequest.builder()
                 .messages(List.of(ImageChatRequestMessage.of(content, imageFileList)))
+                .hasImage(true)
+                .build();
+    }
+
+    public static ImageChatRequest ofWithLanguage(String content, List<File> imageFileList, Language languageCode) {
+        return ImageChatRequest.builder()
+                .messages(List.of(ImageChatRequestMessage.of(content, imageFileList, languageCode)))
                 .hasImage(true)
                 .build();
     }

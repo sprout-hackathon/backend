@@ -11,6 +11,7 @@ import com.hackathon.sprout.domain.chat.dto.response.ChatResponse;
 import com.hackathon.sprout.domain.chat.exception.ChatRoomNotFoundException;
 import com.hackathon.sprout.domain.chat.repository.ChatMessageRepository;
 import com.hackathon.sprout.domain.chat.repository.ChatRoomRepository;
+import com.hackathon.sprout.domain.user.domain.User;
 import com.hackathon.sprout.domain.user.exception.UserNotFoundException;
 import com.hackathon.sprout.domain.user.repository.UserRepository;
 import com.hackathon.sprout.global.shared.DateUtil;
@@ -63,8 +64,9 @@ public class ChatService {
     public ChatMessage createChatRoom(ChatRoomCreateRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = (String) authentication.getPrincipal();
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
-        String reply = chat(ChatRequest.of(request.getTitle()));
+        String reply = chat(ChatRequest.ofWithLanguage(request.getTitle(), user.getLanguageCode()));
         ChatRoom chatRoom = chatRoomRepository.save(request.toEntity(reply, userRepository.findById(userId).orElseThrow(UserNotFoundException::new)));
 
         ChatMessageInsert chatMessageInsert = ChatMessageInsert.builder()
@@ -79,7 +81,7 @@ public class ChatService {
     public ChatMessage saveChatMessage(ChatMessageCreateRequest request) {
         ChatRoom chatRoom = chatRoomRepository.findById(request.getChatRoomId()).orElseThrow(ChatRoomNotFoundException::new);
 
-        String reply = chat(ChatRequest.of(chatRoom, request.getContent()));
+        String reply = chat(ChatRequest.ofWithLanguage(chatRoom, request.getContent()));
 
         ChatMessageInsert chatMessageInsert = ChatMessageInsert.builder()
                 .chatRoom(chatRoom)
