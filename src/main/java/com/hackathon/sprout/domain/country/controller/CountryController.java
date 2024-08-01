@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,8 +33,8 @@ public class CountryController {
             @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping
-    public List<Nation> getAllNations() {
-        return nationService.getAllNations();
+    public ResponseEntity<List<Nation>> getAllNations() {
+        return ResponseEntity.ok(nationService.getAllNations());
     }
 
     @Operation(summary = "모든 언어 정보 조회", description = "모든 언어 정보를 조회합니다.")
@@ -42,7 +43,7 @@ public class CountryController {
             @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/languages")
-    public List<Language> getAllLanguages() {
-        return languageService.getAllLanguages();
+    public ResponseEntity<List<Language>> getAllLanguages() {
+        return ResponseEntity.ok(languageService.getAllLanguages());
     }
 }
