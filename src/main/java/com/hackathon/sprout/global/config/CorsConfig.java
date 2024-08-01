@@ -26,6 +26,8 @@ public class CorsConfig implements WebMvcConfigurer {
                         "http://127.0.0.1:3000",
                         "http://localhost:8080",
                         "http://127.0.0.1:8080",
+                        "http://www.un1care.store",
+                        "https://www.un1care.store",
                         developmentOrigin,
                         productionOrigin
                 )
