@@ -18,7 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Users", description = "User 관련 API")
+@Tag(name = "유저", description = "유저 관련 API")
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
