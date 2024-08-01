@@ -121,7 +121,7 @@ public class ChatService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = (String) authentication.getPrincipal();
 
-        LocalDate localDate = DateUtil.convertToLocalDate(condition.date());
+        LocalDate localDate = DateUtil.convertToLocalDate(condition.getDate());
         LocalDateTime startDate = DateUtil.toStartOfDay(localDate);
         LocalDateTime endDate = DateUtil.toEndOfDay(localDate);
 

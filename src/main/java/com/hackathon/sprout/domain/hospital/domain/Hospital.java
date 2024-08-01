@@ -31,7 +31,7 @@ public class Hospital extends BaseTimeEntity {
     private String webUrl;
 
     @Schema(description = "병원 설명", example = "서울대학교병원은 대한민국 서울특별시에 위치한 병원입니다.")
-    @Column(columnDefinition = "TEXT")
+    @Column(length = 10000)
     private String description;
 
     @Schema(description = "병원 주소")
