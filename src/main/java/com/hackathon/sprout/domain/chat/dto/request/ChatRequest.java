@@ -10,17 +10,20 @@ import java.util.stream.Stream;
 
 @Builder
 public record ChatRequest (
-    List<ChatRequestMessage> messages
+        Boolean hasImage,
+        List<ChatRequestMessage> messages
 ){
     public static ChatRequest of(String content) {
         return ChatRequest.builder()
                 .messages(List.of(ChatRequestMessage.of(content)))
+                .hasImage(false)
                 .build();
     }
 
     public static ChatRequest of(ChatRoom chatRoom) {
         return ChatRequest.builder()
                 .messages(chatRoom.getChatMessageList().stream().map(ChatRequestMessage::of).toList())
+                .hasImage(false)
                 .build();
     }
 
@@ -32,6 +35,7 @@ public record ChatRequest (
 
         return ChatRequest.builder()
                 .messages(messages)
+                .hasImage(false)
                 .build();
     }
 
@@ -43,6 +47,7 @@ public record ChatRequest (
 
         return ChatRequest.builder()
                 .messages(messages)
+                .hasImage(false)
                 .build();
     }
 }
