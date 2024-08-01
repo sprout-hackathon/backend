@@ -1,6 +1,7 @@
 package com.hackathon.sprout.domain.chat.dto.request;
 
 import com.hackathon.sprout.domain.chat.domain.ChatRoom;
+import com.hackathon.sprout.domain.country.domain.Language;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
@@ -17,6 +18,13 @@ public record ChatRequest(
     public static ChatRequest of(String content) {
         return ChatRequest.builder()
                 .messages(List.of(ChatRequestMessage.of(content)))
+                .hasImage(false)
+                .build();
+    }
+
+    public static ChatRequest ofWithLanguage(String content, Language language) {
+        return ChatRequest.builder()
+                .messages(List.of(ChatRequestMessage.of(content, language)))
                 .hasImage(false)
                 .build();
     }

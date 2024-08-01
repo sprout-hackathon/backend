@@ -1,11 +1,8 @@
 package com.hackathon.sprout.domain.chat.service;
 
-import com.hackathon.sprout.domain.chat.domain.ChatMessage;
-import com.hackathon.sprout.domain.chat.domain.ChatRoom;
 import com.hackathon.sprout.domain.chat.domain.ImageMessage;
 import com.hackathon.sprout.domain.chat.domain.ImageRoom;
 import com.hackathon.sprout.domain.chat.dto.ChatSearchCondition;
-import com.hackathon.sprout.domain.chat.dto.ImageChatMessageInsert;
 import com.hackathon.sprout.domain.chat.dto.request.*;
 import com.hackathon.sprout.domain.chat.dto.response.ChatResponse;
 import com.hackathon.sprout.domain.chat.exception.ChatRoomNotFoundException;
@@ -13,6 +10,7 @@ import com.hackathon.sprout.domain.chat.repository.ImageMessageRepository;
 import com.hackathon.sprout.domain.chat.repository.ImageRoomRepository;
 import com.hackathon.sprout.domain.file.domain.File;
 import com.hackathon.sprout.domain.file.service.FileService;
+import com.hackathon.sprout.domain.user.domain.User;
 import com.hackathon.sprout.domain.user.exception.UserNotFoundException;
 import com.hackathon.sprout.domain.user.repository.UserRepository;
 import com.hackathon.sprout.global.shared.DateUtil;
@@ -64,6 +62,10 @@ public class ImageChatService {
     }
 
     public ImageMessage saveChatMessage(ImageChatMessageCreateRequest request, List<MultipartFile> imageFileList) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = (String) authentication.getPrincipal();
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
         ImageRoom imageRoom = imageRoomRepository.findById(request.imageRoomId()).orElseThrow(ChatRoomNotFoundException::new);
 
         // 이미지 채팅방에 채팅 등록
@@ -73,7 +75,7 @@ public class ImageChatService {
         List<File> savedFileList = fileService.saveFiles(sendMessage.getImageMessageId(), imageFileList);
 
         // 이미지와 프롬프트 챗봇에게 전달 후 답변 받아옴
-        String reply = chat(ImageChatRequest.of(request.content(), savedFileList));
+        String reply = chat(ImageChatRequest.ofWithLanguage(request.content(), savedFileList, user.getLanguageCode()));
 
         return saveChatMessage(imageRoom, reply, true);
     }
@@ -81,6 +83,7 @@ public class ImageChatService {
     public ImageMessage createChatRoom(ImageChatRoomCreateRequest request, List<MultipartFile> imageFileList) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = (String) authentication.getPrincipal();
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         // 이미지 채팅방 생성
         ImageRoom imageRoom = imageRoomRepository.save(request.toEntity(userRepository.findById(userId).orElseThrow(UserNotFoundException::new)));
@@ -92,7 +95,7 @@ public class ImageChatService {
         List<File> savedFileList = fileService.saveFiles(sendMessage.getImageMessageId(), imageFileList);
 
         // 이미지와 프롬프트 챗봇에게 전달 후 답변 받아옴
-        String reply = chat(ImageChatRequest.of(request.title(), savedFileList));
+        String reply = chat(ImageChatRequest.ofWithLanguage(request.title(), savedFileList, user.getLanguageCode()));
 
         return saveChatMessage(imageRoom, reply, true);
     }
