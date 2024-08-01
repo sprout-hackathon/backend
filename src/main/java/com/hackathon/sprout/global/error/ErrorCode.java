@@ -17,7 +17,8 @@ public enum ErrorCode {
     BOARD_NOT_FOUND(404, "BOARD_NOT_FOUND", "게시판을 찾을 수 없습니다."),
     COMMENT_NOT_FOUND(404, "COMMENT_NOT_FOUND", "댓글을 찾을 수 없습니다."),
     INVALID_PASSWORD(401, "INVALID_PASSWORD", "비밀번호가 틀렸습니다."),
-    CHAT_ROOM_NOT_FOUND(404, "CHAT_ROOM_NOT_FOUND", "채팅방을 찾을 수 없습니다. chatRoomId를 확인해주세요");
+    CHAT_ROOM_NOT_FOUND(404, "CHAT_ROOM_NOT_FOUND", "채팅방을 찾을 수 없습니다. chatRoomId를 확인해주세요"),
+    IMAGE_ROOM_NOT_FOUND(404, "IMAGE_ROOM_NOT_FOUND", "이미지방을 찾을 수 없습니다. imageRoomId를 확인해주세요");
 
 
     private final int httpStatus;
