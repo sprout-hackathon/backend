@@ -1,5 +1,6 @@
 package com.hackathon.sprout.domain.board.domain;
 
+import com.hackathon.sprout.domain.board.enums.BoardType;
 import com.hackathon.sprout.domain.user.domain.User;
 import com.hackathon.sprout.global.shared.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -25,7 +26,8 @@ public class Board extends BaseTimeEntity {
     private String content;
 
     @Column
-    private String category;
+    @Enumerated(EnumType.STRING)
+    private BoardType category;
 
     @Column
     private Integer views;

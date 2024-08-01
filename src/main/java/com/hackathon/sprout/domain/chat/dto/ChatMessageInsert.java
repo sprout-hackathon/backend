@@ -1,8 +1,10 @@
 package com.hackathon.sprout.domain.chat.dto;
 
-import com.hackathon.sprout.domain.chat.domain.ChatMessage;
 import com.hackathon.sprout.domain.chat.domain.ChatRoom;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
