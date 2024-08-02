@@ -8,6 +8,7 @@ import com.hackathon.sprout.domain.chat.dto.request.ChatMessageCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.request.ChatRequest;
 import com.hackathon.sprout.domain.chat.dto.request.ChatRoomCreateRequest;
 import com.hackathon.sprout.domain.chat.dto.response.ChatResponse;
+import com.hackathon.sprout.domain.chat.dto.response.ChatRecommendResponse;
 import com.hackathon.sprout.domain.chat.exception.ChatRoomNotFoundException;
 import com.hackathon.sprout.domain.chat.repository.ChatMessageRepository;
 import com.hackathon.sprout.domain.chat.repository.ChatRoomRepository;
@@ -49,7 +50,15 @@ public class ChatService {
                 .bodyToMono(ChatResponse.class).block()).response();
     }
 
-    public List<String> chatForRecommendation(String message) {
+    public List<String> recommend(ChatRoom room) {
+        return Objects.requireNonNull(webClient.post()
+                .uri(AI_BASE_URL + "/recommend")
+                .bodyValue(ChatRequest.of(room))
+                .retrieve()
+                .bodyToMono(ChatRecommendResponse.class).block()).responseList();
+    }
+
+    public List<String> chatForRecommendation(ChatRoom room) {
         //TODO : 실제 GPT API 연동
         List<String> recommendationList = new ArrayList<>();
 
@@ -57,7 +66,8 @@ public class ChatService {
         recommendationList.add("요양 보호사의 힘든 점");
         recommendationList.add("외국인 요양보호사가 되려면?");
 
-        return recommendationList;
+        return recommend(room);
+//        return recommendationList;
     }
 
 

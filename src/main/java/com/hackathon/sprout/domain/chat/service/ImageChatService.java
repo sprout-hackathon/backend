@@ -94,9 +94,7 @@ public class ImageChatService {
         // 이미지와 프롬프트 챗봇에게 전달 후 답변 받아옴
         String reply = chat(ImageChatRequest.ofWithLanguage(request.title(), savedFileList, user.getLanguageCode()));
 
-        saveChatMessage(imageRoom, reply, true);
-
-        return sendMessage;
+        return saveChatMessage(imageRoom, reply, true);
     }
 
     public ImageMessage saveChatMessage(ImageRoom imageRoom, String content, Boolean isBot) {

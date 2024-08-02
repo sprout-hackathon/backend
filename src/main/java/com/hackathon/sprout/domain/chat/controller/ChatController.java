@@ -84,8 +84,10 @@ public class ChatController {
     })
     @PostMapping("/messages")
     public ResponseEntity<ChatMessageResponse> createMessage(@RequestBody ChatMessageCreateRequest request) {
+        ChatMessage chatMessage = chatService.saveChatMessage(request);
+
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ChatMessageResponse(chatService.saveChatMessage(request), chatService.chatForRecommendation(request.getContent())));
+                .body(new ChatMessageResponse(chatService.saveChatMessage(request), chatService.chatForRecommendation(chatMessage.getChatRoom())));
     }
 
     @Operation(summary = "채팅방 삭제", description = "특정 채팅방을 삭제합니다.")
@@ -106,8 +108,8 @@ public class ChatController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PostMapping(value = "/images/rooms", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ImageChatMessageInitResponse> createRoom(@RequestPart ImageChatRoomCreateRequest request, @RequestPart List<MultipartFile> fileList) {
+    @PostMapping(value = "/images/rooms", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<ImageChatMessageInitResponse> createRoom(@RequestPart ImageChatRoomCreateRequest request, @RequestPart(required = false) List<MultipartFile> fileList) {
         ImageMessage message = imageChatService.createChatRoom(request, fileList);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ImageChatMessageInitResponse(message));
@@ -119,8 +121,8 @@ public class ChatController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PostMapping(value = "/images/messages", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ImageChatMessageResponse> createImageMessage(@RequestPart ImageChatMessageCreateRequest request, @RequestPart List<MultipartFile> fileList) {
+    @PostMapping(value = "/images/messages", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<ImageChatMessageResponse> createImageMessage(@RequestPart ImageChatMessageCreateRequest request, @RequestPart(required = false) List<MultipartFile> fileList) {
         ImageMessage message = imageChatService.saveChatMessage(request, fileList);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ImageChatMessageResponse(message));
